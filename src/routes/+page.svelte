@@ -5,6 +5,7 @@
 	import SandboxIcon from "flowbite-svelte-icons/MicroscopeSolid.svelte"
 	import NewItemWidget from "$lib/components/NewItemWidget.svelte"
 	import { type Component } from "svelte"
+	import { resolve } from "$app/paths"
 </script>
 
 <svelte:head>
@@ -24,10 +25,10 @@
 <main
 	class="grid max-h-screen w-screen grid-cols-2 items-start justify-items-center gap-y-7 overflow-hidden p-5"
 >
-	{@render Card("/words", "Words", WordsIcon)}
-	{@render Card("/words/study", "Study words", StudyIcon)}
-	{@render Card("/settings", "Settings", SettingsIcon)}
-	{@render Card("/sandbox", "Sandbox", SandboxIcon)}
+	{@render Card(resolve("/words"), "Words", WordsIcon)}
+	{@render Card(resolve("/words/study"), "Study words", StudyIcon)}
+	{@render Card(resolve("/settings"), "Settings", SettingsIcon)}
+	{@render Card(resolve("/sandbox"), "Sandbox", SandboxIcon)}
 </main>
 
 <NewItemWidget class="absolute right-4 bottom-4" />

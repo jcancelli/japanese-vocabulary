@@ -15,6 +15,7 @@
 	import { deleteWord, updateWord } from "$lib/database"
 	import type { ZodObject } from "zod"
 	import type { Word } from "$lib/model"
+	import { resolve } from "$app/paths"
 
 	export interface EditWordPageProps<TWord extends WordDTO> {
 		word: TWord
@@ -61,12 +62,12 @@
 		}
 		// TODO: alert success/failure
 
-		goto(`/words/view/${word.id}`)
+		goto(resolve("/words/view/[wordId]", { wordId: word.id }))
 	}
 
 	async function ondelete() {
 		await deleteWord(word.id)
-		goto("/words")
+		goto(resolve("/words"))
 	}
 
 	function clearErrors() {
@@ -96,7 +97,7 @@
 		</Button>
 		<Button
 			color="gray"
-			href="/words/view/{word.id}"
+			href={resolve("/words/view/[wordId]", { wordId: word.id })}
 		>
 			<CancelIcon /> Cancel
 		</Button>

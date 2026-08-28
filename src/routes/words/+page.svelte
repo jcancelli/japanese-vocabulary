@@ -5,6 +5,7 @@
 	import SearchInput from "flowbite-svelte/Search.svelte"
 	import HomeIcon from "flowbite-svelte-icons/HomeSolid.svelte"
 	import NewItemWidget from "$lib/components/NewItemWidget.svelte"
+	import { resolve } from "$app/paths"
 
 	const words = $derived(liveQuery(getAllWords))
 
@@ -40,7 +41,7 @@
 	/>
 	<!-- Home button -->
 	<a
-		href="/"
+		href={resolve("/")}
 		class="flex size-12 items-center justify-center"
 	>
 		<HomeIcon
@@ -63,13 +64,13 @@
 			{@const { meaning, note } = word.meanings[0]}
 			<!-- Word -->
 			<a
-				href="/words/view/{word.id}"
+				href={resolve("/words/view/[wordId]", { wordId: word.id })}
 				class="cursor-pointer py-2 pr-0.5 pl-2 hover:underline nth-[4n-1]:bg-neutral-100"
 			>
 				{word.primaryWriting}
 			</a>
 			<a
-				href="/words/view/{word.id}"
+				href={resolve("/words/view/[wordId]", { wordId: word.id })}
 				class="cursor-pointer overflow-hidden px-0.5 py-2 text-ellipsis whitespace-nowrap hover:underline nth-[4n]:bg-neutral-100"
 			>
 				{note ? `${meaning} (${note.toLowerCase()})` : meaning}

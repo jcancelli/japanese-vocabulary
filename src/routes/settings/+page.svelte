@@ -2,6 +2,7 @@
 	import Button from "flowbite-svelte/Button.svelte"
 	import HomeIcon from "flowbite-svelte-icons/HomeSolid.svelte"
 	import Labeled from "$lib/components/Labeled.svelte"
+	import { resolve } from "$app/paths"
 
 	function exportDb() {}
 </script>
@@ -10,7 +11,7 @@
 <div class="flex flex-row-reverse flex-nowrap gap-1 bg-neutral-50 p-2">
 	<!-- Home button -->
 	<a
-		href="/"
+		href={resolve("/")}
 		class="flex size-12 items-center justify-center"
 	>
 		<HomeIcon

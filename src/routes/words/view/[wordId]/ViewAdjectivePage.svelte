@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from "$app/paths"
 	import { JLPT_LEVEL_COLOR } from "$lib/colors"
 	import Labeled from "$lib/components/Labeled.svelte"
 	import { getAllRelatedWords } from "$lib/database"
@@ -75,7 +76,7 @@
 			{#await getAllRelatedWords(word.id) then relatedWords}
 				{#each relatedWords as relatedWord}
 					<a
-						href={`/words/view/${relatedWord.id}`}
+						href={resolve("/words/view/[wordId]", { wordId: relatedWord.id })}
 						class="block cursor-pointer py-1 hover:underline"
 					>
 						{relatedWord.primaryWriting}

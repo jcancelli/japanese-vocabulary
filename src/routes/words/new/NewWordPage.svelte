@@ -13,6 +13,7 @@
 	import { createWord } from "$lib/database"
 	import type { ZodObject } from "zod"
 	import type { Word } from "$lib/model"
+	import { resolve } from "$app/paths"
 
 	export interface NewWordPageProps<TWord extends WordDTO> {
 		word: TWord
@@ -58,7 +59,7 @@
 		}
 		// TODO: alert success/failure
 
-		goto(`/words/view/${word.id}`)
+		goto(resolve("/words/view/[wordId]", { wordId: word.id }))
 	}
 
 	function clearErrors() {
@@ -82,7 +83,7 @@
 		</Button>
 		<Button
 			color="gray"
-			href="/words"
+			href={resolve("/words")}
 		>
 			<CancelIcon /> Cancel
 		</Button>

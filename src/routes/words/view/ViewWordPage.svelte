@@ -6,6 +6,7 @@
 	import type { Snippet } from "svelte"
 	import WordPage from "../WordPage.svelte"
 	import type { WordDTO } from "$lib/dto.svelte"
+	import { resolve } from "$app/paths"
 
 	export interface ViewWordPageProps {
 		word: WordDTO
@@ -25,13 +26,13 @@
 	{#snippet buttons()}
 		<Button
 			color="secondary"
-			href="/words/edit/{word.id}"
+			href={resolve("/words/edit/[wordId]", { wordId: word.id })}
 		>
 			<EditIcon /> Edit
 		</Button>
 		<Button
 			color="gray"
-			href="/words"
+			href={resolve("/words")}
 		>
 			<BackIcon /> Back
 		</Button>
