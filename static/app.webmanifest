@@ -1,0 +1,43 @@
+{
+	"background_color": "#ffffff",
+	"categories": [
+		"languages",
+		"study"
+	],
+	"description": "Japanese vocabulary study tool",
+	"display": "standalone",
+	"icons": [
+		{
+			"purpose": "maskable",
+			"sizes": "512x512",
+			"src": "icon512_maskable.png",
+			"type": "image/png"
+		},
+		{
+			"purpose": "any",
+			"sizes": "512x512",
+			"src": "icon512_rounded.png",
+			"type": "image/png"
+		}
+	],
+	"id": "http://jcancelli.github.io/japanese-vocabulary",
+	"name": "Japanese Flashcards",
+	"orientation": "natural",
+	"scope": "http://jcancelli.github.io/japanese-vocabulary",
+	"screenshots": [],
+	"short_name": "Japanese",
+	"shortcuts": [
+		{
+			"name": "Words",
+			"description": "List of all the saved words",
+			"url": "/list-words"
+		},
+		{
+			"name": "Study",
+			"description": "Study flashcards",
+			"url": "/study"
+		}
+	],
+	"start_url": "http://jcancelli.github.io/japanese-vocabulary",
+	"theme_color": "#e95a6b"
+}
