@@ -21,6 +21,10 @@
 	const allTags = liveQuery(getAllTags)
 </script>
 
+<svelte:head>
+	<title>Configure study session</title>
+</svelte:head>
+
 <main class="grid h-screen w-screen grid-cols-1 grid-rows-[1fr_min-content]">
 	<!-- Form -->
 	<div class="flex flex-col gap-6 overflow-auto p-6">
