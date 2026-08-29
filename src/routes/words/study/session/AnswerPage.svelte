@@ -9,20 +9,46 @@
 		word: WordDTO
 		language: StudySessionLanguage
 		answer: string
-		isCorrect: boolean
-		onnextword: () => void
+		onNextWord: () => void
 	}
 
-	let { word, language, answer, isCorrect, onnextword }: AnswerPageProps = $props()
+	let { word, language, answer, onNextWord }: AnswerPageProps = $props()
+
+	const isCorrect = $derived.by(() => {
+		if (language === StudySessionLanguage.ENG_TO_JAP) {
+			for (const { meaning } of word.meanings) {
+				if (meaning.trim().toLowerCase() === answer) {
+					return true
+				}
+			}
+			return false
+		}
+
+		if (language === StudySessionLanguage.JAP_TO_ENG) {
+			if (
+				(word.kanji !== undefined && word.kanji.toLowerCase() === answer)
+				|| word.kana.toLowerCase() === answer
+			) {
+				return true
+			}
+			return false
+		}
+
+		throw new Error("Invalid language")
+	})
 
 	async function updateDifficulty(difficulty: WordDifficulty) {
 		if (difficulty !== word.difficulty) {
 			word.difficulty = difficulty
 			await updateWord(word)
 		}
-		onnextword()
+		onNextWord()
 	}
 </script>
+
+<svelte:head>
+	<title>{isCorrect ? "Correct" : "Wrong"}</title>
+</svelte:head>
 
 <main class="grid h-screen w-screen grid-cols-1 grid-rows-[1fr_min-content]">
 	<div

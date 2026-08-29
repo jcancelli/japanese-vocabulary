@@ -6,19 +6,25 @@
 	import StartIcon from "flowbite-svelte-icons/StarSolid.svelte"
 	import BackIcon from "flowbite-svelte-icons/ChevronLeftOutline.svelte"
 	import { liveQuery } from "dexie"
-	import { getAllTags } from "$lib/database"
+	import { getAllTags, getStudySessionWords } from "$lib/database"
 	import { JLPTLevel, WordDifficulty } from "$lib/model"
 	import { JLPT_LEVEL_PRETTY_STRING, WORD_DIFFICULTY_PRETTY_STRING } from "$lib/strings"
-	import type { WordStudySessionParams } from "$lib/study_session"
+	import { getWordStudySessionContext } from "$lib/study_session"
+	import { resolve } from "$app/paths"
+	import { goto } from "$app/navigation"
 
-	export interface ConfigurePageProps {
-		sessionParams: WordStudySessionParams
-		onsessionstart: () => void
-	}
-
-	let { sessionParams = $bindable(), onsessionstart }: ConfigurePageProps = $props()
+	const session = getWordStudySessionContext()
 
 	const allTags = liveQuery(getAllTags)
+
+	async function startSession() {
+		session.words = await getStudySessionWords(session.params)
+		if (session.words.length === 0) {
+			goto(resolve("/words/study/no-more-words"))
+			return
+		}
+		goto(resolve("/words/study/session"))
+	}
 </script>
 
 <svelte:head>
@@ -31,17 +37,17 @@
 		<!-- Only tags -->
 		<Labeled label="Only tags">
 			<Tags
-				bind:value={sessionParams.tags.only}
+				bind:value={session.params.tags.only}
 				availableTags={$allTags ?? []}
 				allowNewTags={false}
 				unique
 				showHelper
 			/>
 		</Labeled>
-		<!-- Wi1thout tags -->
+		<!-- Without tags -->
 		<Labeled label="Without tags">
 			<Tags
-				bind:value={sessionParams.tags.without}
+				bind:value={session.params.tags.without}
 				availableTags={$allTags ?? []}
 				allowNewTags={false}
 				unique
@@ -50,7 +56,7 @@
 		</Labeled>
 		<!-- Difficulty -->
 		{#snippet difficultyCheckbox(difficulty: WordDifficulty)}
-			<Checkbox bind:checked={sessionParams.difficulty[difficulty]}>
+			<Checkbox bind:checked={session.params.difficulty[difficulty]}>
 				{WORD_DIFFICULTY_PRETTY_STRING[difficulty]}
 			</Checkbox>
 		{/snippet}
@@ -65,7 +71,7 @@
 		</Labeled>
 		<!-- JLPT level -->
 		{#snippet jlptLevelCheckbox(level: JLPTLevel)}
-			<Checkbox bind:checked={sessionParams.jlptLevel[level]}>
+			<Checkbox bind:checked={session.params.jlptLevel[level]}>
 				{JLPT_LEVEL_PRETTY_STRING[level]}
 			</Checkbox>
 		{/snippet}
@@ -84,15 +90,15 @@
 	<div class="flex flex-col flex-nowrap gap-2 px-1 py-3">
 		<Button
 			color="primary"
-			onclick={onsessionstart}
+			onclick={startSession}
 		>
 			<StartIcon /> Start
 		</Button>
 		<Button
 			color="gray"
-			href="/"
+			href={resolve("/")}
 		>
-			<BackIcon /> Back
+			<BackIcon /> Home
 		</Button>
 	</div>
 </main>

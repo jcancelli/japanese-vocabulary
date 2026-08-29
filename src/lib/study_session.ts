@@ -1,4 +1,40 @@
 import type { JLPTLevel, WordDifficulty } from "$lib/model"
+import { createContext } from "svelte"
+import type { WordDTO } from "./dto.svelte"
+
+export const [getWordStudySessionContext, setWordStudySessionSessionContext] =
+	createContext<WordStudySession>()
+
+export const WORD_STUDY_SESSION_LOCAL_STORAGE_KEY = "wordStudySession"
+
+export const wordStudySessionLocalStorage = {
+	get params(): WordStudySessionParams {
+		const key = `${WORD_STUDY_SESSION_LOCAL_STORAGE_KEY}.params`
+		const val = localStorage.getItem(key)
+		if (val) {
+			return JSON.parse(val)
+		}
+		return {
+			tags: {
+				only: [],
+				without: [],
+			},
+			jlptLevel: {},
+			difficulty: {},
+			language: {},
+		}
+	},
+
+	set params(value: WordStudySessionParams) {
+		const key = `${WORD_STUDY_SESSION_LOCAL_STORAGE_KEY}.params`
+		localStorage.setItem(key, JSON.stringify(value))
+	},
+}
+
+export interface WordStudySession {
+	params: WordStudySessionParams
+	words: WordDTO[]
+}
 
 export interface WordStudySessionParams {
 	tags: {
@@ -19,12 +55,4 @@ export interface WordStudySessionParams {
 export enum StudySessionLanguage {
 	ENG_TO_JAP,
 	JAP_TO_ENG,
-}
-
-export enum WordStudySessionStep {
-	CONFIGURE,
-	QUESTION,
-	ANSWER_RIGHT,
-	ANSWER_WRONG,
-	NO_MORE_WORDS,
 }

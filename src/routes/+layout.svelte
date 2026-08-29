@@ -10,6 +10,7 @@
 		rel="icon"
 		href={favicon}
 	/>
-	<title>Flashcards</title>
+	<title>Japanese Vocabulary</title>
 </svelte:head>
-{@render children()}
+
+{@render children?.()}

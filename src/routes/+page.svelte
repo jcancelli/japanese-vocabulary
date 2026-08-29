@@ -26,7 +26,7 @@
 	class="grid max-h-screen w-screen grid-cols-2 items-start justify-items-center gap-y-7 overflow-hidden p-5"
 >
 	{@render Card(resolve("/words"), "Words", WordsIcon)}
-	{@render Card(resolve("/words/study"), "Study words", StudyIcon)}
+	{@render Card(resolve("/words/study/configure"), "Study words", StudyIcon)}
 	{#if import.meta.env.DEV}
 		{@render Card(resolve("/settings"), "Settings", SettingsIcon)}
 		{@render Card(resolve("/sandbox"), "Sandbox", SandboxIcon)}

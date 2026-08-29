@@ -5,24 +5,27 @@
 	import Button from "flowbite-svelte/Button.svelte"
 
 	export interface QuestionPageProps {
+		answer: string
 		word: WordDTO
 		language: StudySessionLanguage
-		onanswer: (answer: string, word: WordDTO, language: StudySessionLanguage) => void
+		onCommitAnswer: () => void
 	}
 
-	let { word, language, onanswer }: QuestionPageProps = $props()
+	let { answer = $bindable(), word, language, onCommitAnswer }: QuestionPageProps = $props()
 
-	let answer = $state("")
+	const question = $derived(
+		language === StudySessionLanguage.JAP_TO_ENG ? word.primaryMeaning : word.primaryWriting,
+	)
 </script>
+
+<svelte:head>
+	<title>{question}</title>
+</svelte:head>
 
 <main class="flex h-screen w-screen flex-col items-center justify-center p-6">
 	<!-- Question -->
 	<h2 class="text-3xl font-bold">
-		{#if language === StudySessionLanguage.JAP_TO_ENG}
-			{word.primaryMeaning}
-		{:else}
-			{word.primaryWriting}
-		{/if}
+		{question}
 	</h2>
 	<!-- Answer input -->
 	<div class="mt-6 w-10/12">
@@ -36,7 +39,7 @@
 	<div class="mt-6">
 		<Button
 			color="primary"
-			onclick={() => onanswer(answer.trim(), word, language)}
+			onclick={onCommitAnswer}
 		>
 			Sumbit
 		</Button>
