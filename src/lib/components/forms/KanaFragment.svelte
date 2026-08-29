@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { nonKanaCharacterRegex } from "$lib/japanese/regex"
 	import Input from "flowbite-svelte/Input.svelte"
 	import Helper from "flowbite-svelte/Helper.svelte"
 	import Labeled from "../Labeled.svelte"
@@ -23,7 +22,7 @@
 		placeholder="Kana"
 		color={error ? "red" : "default"}
 		{disabled}
-		bind:value={() => value, (v) => (value = v.replaceAll(nonKanaCharacterRegex, ""))}
+		bind:value
 	/>
 	{#if error}
 		<Helper

@@ -3,7 +3,6 @@
 	import Input from "flowbite-svelte/Input.svelte"
 	import Helper from "flowbite-svelte/Helper.svelte"
 	import PlusIcon from "flowbite-svelte-icons/PlusOutline.svelte"
-	import { nonKanjiKanaCharacterRegex } from "$lib/japanese/regex"
 	import Labeled from "../Labeled.svelte"
 
 	export interface KanjiFragmentProps {
@@ -38,9 +37,7 @@
 			placeholder="Kanji"
 			color={error ? "red" : "default"}
 			{disabled}
-			bind:value={
-				() => value ?? "", (v) => (value = v.replaceAll(nonKanjiKanaCharacterRegex, ""))
-			}
+			bind:value
 		/>
 		{#if error}
 			<Helper
