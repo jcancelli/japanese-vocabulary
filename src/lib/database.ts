@@ -1,4 +1,4 @@
-import Dexie, { type Collection, type EntityTable, type InsertType, type WhereClause } from "dexie"
+import Dexie, { type EntityTable } from "dexie"
 import {
 	JLPTLevel,
 	WordDifficulty,
@@ -405,8 +405,35 @@ export async function getWord(wordId: UUIDv4): Promise<WordDTO> {
 export async function updateWord(word: Word): Promise<void> {
 	// Update base word
 	await db.words.update(word.id, stripId(mapWordToWordData(word)))
-	// TODO: destroy deleted word relationships
-	// TODO: create new word relationships
+
+	// Update word relationships
+	const oldRelatedWordsIds = await db.relatedWords
+		.where("wordId")
+		.equals(word.id)
+		.toArray()
+		.then((relationships) => {
+			return new Set(relationships.map((relationship) => relationship.relatedId))
+		})
+	const newRelatedWordsIds = new Set(word.relatedWords)
+	const relationshipsToCreateIds = Array.from(newRelatedWordsIds.difference(oldRelatedWordsIds))
+	const relationshipsToDeleteIds = Array.from(oldRelatedWordsIds.difference(newRelatedWordsIds))
+	// Delete remove relationships
+	await db.relatedWords
+		.where("wordId")
+		.anyOf(relationshipsToDeleteIds)
+		.or("relatedId")
+		.anyOf(relationshipsToDeleteIds)
+		.delete()
+	// Create new relationships
+	await db.relatedWords.bulkAdd(
+		relationshipsToCreateIds.flatMap((id) => {
+			return [
+				{ wordId: word.id, relatedId: id },
+				{ wordId: id, relatedId: word.id },
+			]
+		}),
+	)
+
 	// Update wordType specific data
 	switch (word.wordType) {
 		case WordType.NOUN:
