@@ -10,6 +10,7 @@
 	let session = $state({
 		params: data.params,
 		words: data.words,
+		step: data.step,
 	})
 
 	setWordStudySessionSessionContext(session)

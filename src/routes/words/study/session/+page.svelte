@@ -1,11 +1,19 @@
 <script lang="ts">
-	import { getWordStudySessionContext, StudySessionLanguage } from "$lib/study_session"
+	import {
+		getWordStudySessionContext,
+		StudySessionLanguage,
+		WordStudySessionStep,
+	} from "$lib/study_session"
 	import AnswerPage from "./AnswerPage.svelte"
 	import QuestionPage from "./QuestionPage.svelte"
 	import { goto } from "$app/navigation"
 	import { resolve } from "$app/paths"
 
 	const session = getWordStudySessionContext()
+
+	if (session.step !== WordStudySessionStep.STUDY) {
+		await goto(resolve("/words/study/configure"))
+	}
 
 	let word = $derived(session.words[0])
 	let language = $state(randomLanguage())
@@ -35,6 +43,7 @@
 	function onNextWord() {
 		if (session.words.length === 1) {
 			session.words.splice(0, 1)
+			session.step = WordStudySessionStep.FINISHED
 			goto(resolve("/words/study/no-more-words"))
 			return
 		}

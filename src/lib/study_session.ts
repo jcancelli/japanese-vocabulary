@@ -34,6 +34,13 @@ export const wordStudySessionLocalStorage = {
 export interface WordStudySession {
 	params: WordStudySessionParams
 	words: WordDTO[]
+	step: WordStudySessionStep
+}
+
+export enum WordStudySessionStep {
+	CONFIGURE,
+	STUDY,
+	FINISHED,
 }
 
 export interface WordStudySessionParams {

@@ -9,7 +9,7 @@
 	import { getAllTags, getStudySessionWords } from "$lib/database"
 	import { JLPTLevel, WordDifficulty } from "$lib/model"
 	import { JLPT_LEVEL_PRETTY_STRING, WORD_DIFFICULTY_PRETTY_STRING } from "$lib/strings"
-	import { getWordStudySessionContext } from "$lib/study_session"
+	import { getWordStudySessionContext, WordStudySessionStep } from "$lib/study_session"
 	import { resolve } from "$app/paths"
 	import { goto } from "$app/navigation"
 
@@ -20,10 +20,12 @@
 	async function startSession() {
 		session.words = await getStudySessionWords(session.params)
 		if (session.words.length === 0) {
-			goto(resolve("/words/study/no-more-words"))
+			session.step = WordStudySessionStep.FINISHED
+			await goto(resolve("/words/study/no-more-words"))
 			return
 		}
-		goto(resolve("/words/study/session"))
+		session.step = WordStudySessionStep.STUDY
+		await goto(resolve("/words/study/session"))
 	}
 </script>
 

@@ -8,7 +8,6 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
 
 ## TODO
 
-- Ensure that when visiting a study session route that is not /configure without starting a new session the user is redirected to it
 - Allow selection of language when starting a new study session
 - Add lastStudiedAt Date field to all words
 - Allow to sort words by difficulty or lastStudiedAt when starting a new study session

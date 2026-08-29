@@ -12,6 +12,9 @@ export default defineConfig((config: ConfigEnv) => {
 					runes: ({ filename }) => {
 						return filename.split(/[/\\]/).includes("node_modules") ? undefined : true
 					},
+					experimental: {
+						async: true,
+					},
 				},
 				adapter: adapter(),
 				paths: {
