@@ -27,8 +27,10 @@
 >
 	{@render Card(resolve("/words"), "Words", WordsIcon)}
 	{@render Card(resolve("/words/study"), "Study words", StudyIcon)}
-	{@render Card(resolve("/settings"), "Settings", SettingsIcon)}
-	{@render Card(resolve("/sandbox"), "Sandbox", SandboxIcon)}
+	{#if import.meta.env.DEV}
+		{@render Card(resolve("/settings"), "Settings", SettingsIcon)}
+		{@render Card(resolve("/sandbox"), "Sandbox", SandboxIcon)}
+	{/if}
 </main>
 
 <NewItemWidget class="absolute right-4 bottom-4" />
