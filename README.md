@@ -8,7 +8,8 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
 
 ## TODO
 
-- Allow to sort words by difficulty or lastStudiedAt when starting a new study session
+- Add alternative answers to the correct page
+- Finish the no more words page
 - Add navigation buttons to all the steps of a word study session (go home and edit params)
 - Implement kanjis
 - Add export/import database to settings

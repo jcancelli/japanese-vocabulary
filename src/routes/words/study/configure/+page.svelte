@@ -16,6 +16,7 @@
 	import {
 		getWordStudySessionContext,
 		StudySessionLanguage,
+		WordStudySessionSortingField,
 		WordStudySessionStep,
 	} from "$lib/study_session"
 	import { resolve } from "$app/paths"
@@ -23,6 +24,8 @@
 	import ButtonGroup from "$lib/components/ButtonGroup.svelte"
 	import ToggleButton from "$lib/components/ToggleButton.svelte"
 	import ErrorsFeed from "$lib/components/ErrorsFeed.svelte"
+	import RadioGroup from "$lib/components/RadioGroup.svelte"
+	import Label from "flowbite-svelte/Label.svelte"
 
 	const session = getWordStudySessionContext()
 
@@ -35,7 +38,7 @@
 			!session.params.language[StudySessionLanguage.ENG_TO_JAP]
 			&& !session.params.language[StudySessionLanguage.JAP_TO_ENG]
 		) {
-			errorFeed.addError("Please select a language")
+			errorFeed.addError("Please select one or more languages")
 			return
 		}
 
@@ -118,6 +121,45 @@
 				{@render languageCheckbox(StudySessionLanguage.ENG_TO_JAP)}
 				{@render languageCheckbox(StudySessionLanguage.JAP_TO_ENG)}
 			</ButtonGroup>
+		</Labeled>
+		<!-- Sorting -->
+		<Labeled label="Sort words">
+			<!-- Sort field -->
+			<Label class="mx-auto w-fit">
+				<p class="font-semibold">Field</p>
+				<RadioGroup
+					bind:value={session.params.sort.by}
+					options={[
+						{
+							label: "Difficulty",
+							value: WordStudySessionSortingField.DIFFICULTY,
+						},
+						{
+							label: "Last time studied",
+							value: WordStudySessionSortingField.LAST_STUDIED,
+						},
+					]}
+					class="mx-auto mt-1"
+				/>
+			</Label>
+			<!-- Sort order -->
+			<Label class="mx-auto mt-3 w-fit">
+				<p class="font-semibold">Order</p>
+				<RadioGroup
+					bind:value={session.params.sort.order}
+					options={[
+						{
+							label: "Ascending",
+							value: "ascending",
+						},
+						{
+							label: "Descending",
+							value: "descending",
+						},
+					]}
+					class="mx-auto mt-1"
+				/>
+			</Label>
 		</Labeled>
 	</div>
 	<!-- Buttons -->

@@ -37,6 +37,10 @@ export const wordStudySessionLocalStorage = {
 				[StudySessionLanguage.ENG_TO_JAP]: false,
 				[StudySessionLanguage.JAP_TO_ENG]: false,
 			},
+			sort: {
+				by: WordStudySessionSortingField.DIFFICULTY,
+				order: "descending",
+			},
 		}
 	},
 
@@ -53,9 +57,9 @@ export interface WordStudySession {
 }
 
 export enum WordStudySessionStep {
-	CONFIGURE,
-	STUDY,
-	FINISHED,
+	CONFIGURE = "configure",
+	STUDY = "study",
+	FINISHED = "finished",
 }
 
 export interface WordStudySessionParams {
@@ -72,9 +76,20 @@ export interface WordStudySessionParams {
 	language: {
 		[key in StudySessionLanguage]: boolean
 	}
+	sort: WordStudySessionSorting
 }
 
 export enum StudySessionLanguage {
-	ENG_TO_JAP,
-	JAP_TO_ENG,
+	ENG_TO_JAP = "eng_to_jap",
+	JAP_TO_ENG = "jap_to_eng",
+}
+
+export interface WordStudySessionSorting {
+	by: WordStudySessionSortingField
+	order: "ascending" | "descending"
+}
+
+export enum WordStudySessionSortingField {
+	DIFFICULTY = "difficulty",
+	LAST_STUDIED = "last_studied",
 }

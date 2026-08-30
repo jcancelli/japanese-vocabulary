@@ -24,7 +24,7 @@ import {
 	WordDTO,
 	WordMeaningDTO,
 } from "./dto.svelte"
-import type { WordStudySessionParams } from "./study_session"
+import { WordStudySessionSortingField, type WordStudySessionParams } from "./study_session"
 
 export interface WordData {
 	id: UUIDv4
@@ -470,6 +470,7 @@ export async function getAllTags(): Promise<string[]> {
 }
 
 export async function getStudySessionWords(params: WordStudySessionParams): Promise<WordDTO[]> {
+	// Difficulty
 	const difficulties: WordDifficulty[] = []
 	params.difficulty[WordDifficulty.DONT_KNOW] && difficulties.push(WordDifficulty.DONT_KNOW)
 	params.difficulty[WordDifficulty.KINDA_DONT_KNOW]
@@ -478,18 +479,18 @@ export async function getStudySessionWords(params: WordStudySessionParams): Prom
 	params.difficulty[WordDifficulty.KNOW] && difficulties.push(WordDifficulty.KNOW)
 	params.difficulty[WordDifficulty.UNFORGETTABLE]
 		&& difficulties.push(WordDifficulty.UNFORGETTABLE)
-
 	let query = db.words.where("difficulty").anyOf(difficulties)
 
+	// JLPT level
 	const jlptLevels: JLPTLevel[] = []
 	params.jlptLevel[JLPTLevel.N5] && jlptLevels.push(JLPTLevel.N5)
 	params.jlptLevel[JLPTLevel.N3] && jlptLevels.push(JLPTLevel.N4)
 	params.jlptLevel[JLPTLevel.N3] && jlptLevels.push(JLPTLevel.N3)
 	params.jlptLevel[JLPTLevel.N2] && jlptLevels.push(JLPTLevel.N2)
 	params.jlptLevel[JLPTLevel.N1] && jlptLevels.push(JLPTLevel.N1)
-
 	query = query.and((word) => jlptLevels.includes(word.jlptLevel))
 
+	// Tags
 	if (params.tags.only.length > 0) {
 		query = query.and((word) => {
 			return params.tags.only.every((tag) => word.tags.includes(tag))
@@ -501,7 +502,41 @@ export async function getStudySessionWords(params: WordStudySessionParams): Prom
 		})
 	}
 
+	// Perform query
 	const wordIds = await query.primaryKeys()
+	const words = await Promise.all(wordIds.map(getWord))
 
-	return Promise.all(wordIds.map(getWord))
+	// Sorting
+	let sortFunction: (a: WordDTO, b: WordDTO) => number
+	switch (params.sort.by) {
+		case WordStudySessionSortingField.DIFFICULTY:
+			switch (params.sort.order) {
+				case "ascending":
+					sortFunction = (a, b) => a.difficulty - b.difficulty
+					break
+				case "descending":
+					sortFunction = (a, b) => b.difficulty - a.difficulty
+					break
+				default:
+					throw new Error(`Invalid sort order: ${params.sort.order}`)
+			}
+			break
+		case WordStudySessionSortingField.LAST_STUDIED:
+			switch (params.sort.order) {
+				case "ascending":
+					sortFunction = (a, b) => a.lastStudiedAt.valueOf() - b.lastStudiedAt.valueOf()
+					break
+				case "descending":
+					sortFunction = (a, b) => b.lastStudiedAt.valueOf() - a.lastStudiedAt.valueOf()
+					break
+				default:
+					throw new Error(`Invalid sort order: ${params.sort.order}`)
+			}
+			break
+		default:
+			throw new Error(`Invalid sort by: ${params.sort.by}`)
+	}
+	words.sort(sortFunction)
+
+	return words
 }
