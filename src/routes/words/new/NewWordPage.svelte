@@ -14,6 +14,7 @@
 	import type { ZodObject } from "zod"
 	import type { Word } from "$lib/model"
 	import { resolve } from "$app/paths"
+	import ErrorsFeed from "$lib/components/ErrorsFeed.svelte"
 
 	export interface NewWordPageProps<TWord extends WordDTO> {
 		word: TWord
@@ -27,6 +28,8 @@
 
 	let { word, Schema, children }: NewWordPageProps<TWord> = $props()
 
+	let errorsFeed: ErrorsFeed
+
 	let errors: Errors<TWord> = $state({})
 
 	async function oncreate() {
@@ -34,7 +37,7 @@
 
 		const parseResult = Schema.safeParse(word)
 
-		// Handle error
+		// Handle parse errors
 		if (parseResult.error) {
 			const { issues } = parseResult.error
 			for (const issue of issues) {
@@ -42,8 +45,8 @@
 				if (key in word) {
 					errors[key as keyof typeof errors] = issue.message
 				} else {
+					errorsFeed.addError("Unexpected error while creating the word")
 					console.error(parseResult.error)
-					alert("Woops, check the console")
 				}
 			}
 			return
@@ -54,10 +57,10 @@
 		try {
 			await createWord(newWord)
 		} catch (err: any) {
-			alert("Woops, check the console")
-			throw err
+			errorsFeed.addError("Unexpected error while creating the word")
+			console.error(err)
+			return
 		}
-		// TODO: alert success/failure
 
 		goto(resolve("/words/view/[wordId]", { wordId: word.id }))
 	}
@@ -89,3 +92,8 @@
 		</Button>
 	{/snippet}
 </WordPage>
+
+<ErrorsFeed
+	bind:this={errorsFeed}
+	autoDismissTimeoutMs={5000}
+/>

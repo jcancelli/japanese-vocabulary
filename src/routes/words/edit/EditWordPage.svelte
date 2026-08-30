@@ -16,6 +16,7 @@
 	import type { ZodObject } from "zod"
 	import type { Word } from "$lib/model"
 	import { resolve } from "$app/paths"
+	import ErrorsFeed from "$lib/components/ErrorsFeed.svelte"
 
 	export interface EditWordPageProps<TWord extends WordDTO> {
 		word: TWord
@@ -29,6 +30,7 @@
 
 	let { word, Schema, children }: EditWordPageProps<TWord> = $props()
 
+	let errorsFeed: ErrorsFeed
 	let errors: Errors<TWord> = $state({})
 	let showDeleteModal = $state(false)
 
@@ -37,7 +39,7 @@
 
 		const parseResult = Schema.safeParse(word)
 
-		// Handle error
+		// Handle parse errors
 		if (parseResult.error) {
 			const { issues } = parseResult.error
 			for (const issue of issues) {
@@ -45,8 +47,8 @@
 				if (key in word) {
 					errors[key as keyof typeof errors] = issue.message
 				} else {
+					errorsFeed.addError("Unexpected error while editing the word")
 					console.error(parseResult.error)
-					alert("Woops, check the console")
 				}
 			}
 			return
@@ -57,16 +59,22 @@
 		try {
 			await updateWord(editedWord)
 		} catch (err: any) {
-			alert("Woops, check the console")
-			throw err
+			errorsFeed.addError("Unexpected error while editing the word")
+			console.error(err)
+			return
 		}
-		// TODO: alert success/failure
 
 		goto(resolve("/words/view/[wordId]", { wordId: word.id }))
 	}
 
 	async function ondelete() {
-		await deleteWord(word.id)
+		try {
+			await deleteWord(word.id)
+		} catch (err: any) {
+			errorsFeed.addError("Unexpected error while deleting the word")
+			console.error(err)
+			return
+		}
 		goto(resolve("/words"))
 	}
 
@@ -130,3 +138,8 @@
 		</Button>
 	{/snippet}
 </Modal>
+
+<ErrorsFeed
+	bind:this={errorsFeed}
+	autoDismissTimeoutMs={5000}
+/>
