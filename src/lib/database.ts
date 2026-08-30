@@ -36,6 +36,7 @@ export interface WordData {
 	meanings: WordMeaningData[]
 	examples: ExampleSentence[]
 	tags: string[]
+	lastStudiedAt: Date
 }
 
 export interface VerbData {
@@ -70,7 +71,7 @@ export type Database = Dexie & {
 export const db = new Dexie("JapaneseFlashcards") as Database
 
 db.version(1).stores({
-	words: "id, wordType, jlptLevel, difficulty, kanji, kana, meanings, examples, *tags",
+	words: "id, wordType, jlptLevel, difficulty, kanji, kana, meanings, examples, *tags, lastStudiedAt",
 	verbs: "id, verbType, transitivity",
 	adjectives: "id, adjectiveType",
 	relatedWords: "++, wordId, relatedId",
@@ -87,6 +88,7 @@ export function mapWordToWordData(word: Word): WordData {
 		meanings: word.meanings.map(({ meaning, note }) => ({ meaning, note })),
 		examples: word.examples.map(({ japanese, english }) => ({ japanese, english })),
 		tags: Array.from(word.tags),
+		lastStudiedAt: new Date(word.lastStudiedAt),
 	}
 }
 
@@ -101,6 +103,7 @@ export function mapNounDataToDto(word: WordData & WordRelationshipData): NounDTO
 		word.examples,
 		word.tags,
 		word.relatedWords,
+		word.lastStudiedAt,
 	)
 }
 
@@ -115,6 +118,7 @@ export function mapVerbDataToDto(word: WordData & VerbData & WordRelationshipDat
 		word.examples,
 		word.tags,
 		word.relatedWords,
+		word.lastStudiedAt,
 		word.verbType,
 		word.transitivity,
 	)
@@ -139,6 +143,7 @@ export function mapAdverbDataToDto(word: WordData & WordRelationshipData): Adver
 		word.examples,
 		word.tags,
 		word.relatedWords,
+		word.lastStudiedAt,
 	)
 }
 
@@ -155,6 +160,7 @@ export function mapAdjectiveDataToDto(
 		word.examples,
 		word.tags,
 		word.relatedWords,
+		word.lastStudiedAt,
 		word.adjectiveType,
 	)
 }
@@ -179,6 +185,7 @@ export function mapPreNounAdjectivalDataToDto(
 		word.examples,
 		word.tags,
 		word.relatedWords,
+		word.lastStudiedAt,
 	)
 }
 

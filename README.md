@@ -8,7 +8,6 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
 
 ## TODO
 
-- Add lastStudiedAt Date field to all words
 - Allow to sort words by difficulty or lastStudiedAt when starting a new study session
 - Add navigation buttons to all the steps of a word study session (go home and edit params)
 - Implement kanjis

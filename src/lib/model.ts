@@ -9,6 +9,7 @@ export interface Word {
 	examples: ExampleSentence[]
 	tags: string[]
 	relatedWords: UUIDv4[]
+	lastStudiedAt: Date
 }
 
 export interface Noun extends Word {

@@ -50,6 +50,7 @@ export const WordSchema = z.object({
 	examples: z.array(ExampleSentenceSchema),
 	tags: z.array(TagSchema).refine(isSetLikeArray, "Duplicate tag"),
 	relatedWords: z.array(UUIDv4Schema).refine(isSetLikeArray, "Duplicate related word"),
+	lastStudiedAt: z.date(),
 })
 export const NounSchema = WordSchema.extend({
 	wordType: z.literal(WordType.NOUN),
