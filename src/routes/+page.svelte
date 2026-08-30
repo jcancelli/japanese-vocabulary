@@ -1,6 +1,6 @@
 <script lang="ts">
 	import WordsIcon from "flowbite-svelte-icons/ListOutline.svelte"
-	import StudyIcon from "flowbite-svelte-icons/BookOpenSolid.svelte"
+	import StudyIcon from "flowbite-svelte-icons/BrainOutline.svelte"
 	import SettingsIcon from "flowbite-svelte-icons/AdjustmentsHorizontalSolid.svelte"
 	import SandboxIcon from "flowbite-svelte-icons/MicroscopeSolid.svelte"
 	import NewItemWidget from "$lib/components/NewItemWidget.svelte"
