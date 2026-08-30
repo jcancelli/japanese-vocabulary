@@ -40,6 +40,7 @@
 	async function updateDifficulty(difficulty: WordDifficulty) {
 		if (difficulty !== word.difficulty) {
 			word.difficulty = difficulty
+			word.lastStudiedAt = new Date()
 			await updateWord(word)
 		}
 		onNextWord()
