@@ -4,7 +4,7 @@
 	import Checkbox from "flowbite-svelte/Checkbox.svelte"
 	import Tags from "flowbite-svelte/Tags.svelte"
 	import StartIcon from "flowbite-svelte-icons/StarSolid.svelte"
-	import BackIcon from "flowbite-svelte-icons/ChevronLeftOutline.svelte"
+	import HomeIcon from "flowbite-svelte-icons/HomeOutline.svelte"
 	import { liveQuery } from "dexie"
 	import { getAllTags, getStudySessionWords } from "$lib/database"
 	import { JLPTLevel, WordDifficulty } from "$lib/model"
@@ -70,9 +70,14 @@
 	<title>Configure study session</title>
 </svelte:head>
 
+<!-- Nav -->
+<div class="fixed top-4 right-4 flex flex-row gap-2">
+	<a href={resolve("/")}><HomeIcon class="size-8" /></a>
+</div>
+
 <main class="grid h-screen w-screen grid-cols-1 grid-rows-[1fr_min-content]">
-	<!-- Form -->
-	<div class="flex flex-col gap-6 overflow-auto p-6">
+	<!-- Form, mt-4 gives a little spacing from the nav -->
+	<div class="mt-4 flex flex-col gap-6 overflow-auto p-6">
 		<!-- Only tags -->
 		<Labeled label="Only tags">
 			<Tags
@@ -181,13 +186,7 @@
 			color="primary"
 			onclick={startSession}
 		>
-			<StartIcon /> Start
-		</Button>
-		<Button
-			color="gray"
-			href={resolve("/")}
-		>
-			<BackIcon /> Home
+			Start session
 		</Button>
 	</div>
 </main>
