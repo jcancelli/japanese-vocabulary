@@ -1,4 +1,4 @@
-import type { JLPTLevel, WordDifficulty } from "$lib/model"
+import { JLPTLevel, WordDifficulty } from "$lib/model"
 import { createContext } from "svelte"
 import type { WordDTO } from "./dto.svelte"
 
@@ -19,9 +19,24 @@ export const wordStudySessionLocalStorage = {
 				only: [],
 				without: [],
 			},
-			jlptLevel: {},
-			difficulty: {},
-			language: {},
+			jlptLevel: {
+				[JLPTLevel.N5]: false,
+				[JLPTLevel.N4]: false,
+				[JLPTLevel.N3]: false,
+				[JLPTLevel.N2]: false,
+				[JLPTLevel.N1]: false,
+			},
+			difficulty: {
+				[WordDifficulty.DONT_KNOW]: false,
+				[WordDifficulty.KINDA_DONT_KNOW]: false,
+				[WordDifficulty.KINDA_KNOW]: false,
+				[WordDifficulty.KNOW]: false,
+				[WordDifficulty.UNFORGETTABLE]: false,
+			},
+			language: {
+				[StudySessionLanguage.ENG_TO_JAP]: false,
+				[StudySessionLanguage.JAP_TO_ENG]: false,
+			},
 		}
 	},
 
@@ -49,13 +64,13 @@ export interface WordStudySessionParams {
 		without: string[]
 	}
 	jlptLevel: {
-		[key in JLPTLevel]?: boolean
+		[key in JLPTLevel]: boolean
 	}
 	difficulty: {
-		[key in WordDifficulty]?: boolean
+		[key in WordDifficulty]: boolean
 	}
 	language: {
-		[key in StudySessionLanguage]?: boolean
+		[key in StudySessionLanguage]: boolean
 	}
 }
 

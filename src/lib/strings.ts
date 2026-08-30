@@ -1,4 +1,5 @@
 import { AdjectiveType, JLPTLevel, VerbType, WordDifficulty, WordType } from "./model"
+import { StudySessionLanguage } from "./study_session"
 
 export const JLPT_LEVEL_PRETTY_STRING = {
 	[JLPTLevel.N1]: "N1",
@@ -34,6 +35,11 @@ export const VERB_TYPE_PRETTY_STRING = {
 export const ADJECTIVE_TYPE_PRETTY_STRING = {
 	[AdjectiveType.I]: "I-adjective",
 	[AdjectiveType.NA]: "Na-adjective",
+} as const
+
+export const STUDY_SESSION_LANGUAGE_PRETTY_STRING = {
+	[StudySessionLanguage.ENG_TO_JAP]: "🇬🇧 ➜ 🇯🇵",
+	[StudySessionLanguage.JAP_TO_ENG]: "🇯🇵 ➜ 🇬🇧",
 } as const
 
 export function capitalizeString(str: string): string {

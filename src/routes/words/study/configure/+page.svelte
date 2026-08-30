@@ -8,16 +8,37 @@
 	import { liveQuery } from "dexie"
 	import { getAllTags, getStudySessionWords } from "$lib/database"
 	import { JLPTLevel, WordDifficulty } from "$lib/model"
-	import { JLPT_LEVEL_PRETTY_STRING, WORD_DIFFICULTY_PRETTY_STRING } from "$lib/strings"
-	import { getWordStudySessionContext, WordStudySessionStep } from "$lib/study_session"
+	import {
+		JLPT_LEVEL_PRETTY_STRING,
+		STUDY_SESSION_LANGUAGE_PRETTY_STRING,
+		WORD_DIFFICULTY_PRETTY_STRING,
+	} from "$lib/strings"
+	import {
+		getWordStudySessionContext,
+		StudySessionLanguage,
+		WordStudySessionStep,
+	} from "$lib/study_session"
 	import { resolve } from "$app/paths"
 	import { goto } from "$app/navigation"
+	import ButtonGroup from "$lib/components/ButtonGroup.svelte"
+	import ToggleButton from "$lib/components/ToggleButton.svelte"
+	import ErrorsFeed from "$lib/components/ErrorsFeed.svelte"
 
 	const session = getWordStudySessionContext()
 
 	const allTags = liveQuery(getAllTags)
 
+	let errorFeed: ErrorsFeed
+
 	async function startSession() {
+		if (
+			!session.params.language[StudySessionLanguage.ENG_TO_JAP]
+			&& !session.params.language[StudySessionLanguage.JAP_TO_ENG]
+		) {
+			errorFeed.addError("Please select a language")
+			return
+		}
+
 		session.words = await getStudySessionWords(session.params)
 		if (session.words.length === 0) {
 			session.step = WordStudySessionStep.FINISHED
@@ -73,20 +94,31 @@
 		</Labeled>
 		<!-- JLPT level -->
 		{#snippet jlptLevelCheckbox(level: JLPTLevel)}
-			<Checkbox bind:checked={session.params.jlptLevel[level]}>
+			<ToggleButton bind:checked={session.params.jlptLevel[level]}>
 				{JLPT_LEVEL_PRETTY_STRING[level]}
-			</Checkbox>
+			</ToggleButton>
 		{/snippet}
 		<Labeled label="JLPT Level">
-			<div class="mx-auto flex w-fit flex-row items-start justify-center gap-2">
+			<ButtonGroup class="mx-auto">
 				{@render jlptLevelCheckbox(JLPTLevel.N5)}
 				{@render jlptLevelCheckbox(JLPTLevel.N4)}
 				{@render jlptLevelCheckbox(JLPTLevel.N3)}
 				{@render jlptLevelCheckbox(JLPTLevel.N2)}
 				{@render jlptLevelCheckbox(JLPTLevel.N1)}
-			</div>
+			</ButtonGroup>
 		</Labeled>
-		<!-- TODO: Language -->
+		<!-- Language -->
+		{#snippet languageCheckbox(language: StudySessionLanguage)}
+			<ToggleButton bind:checked={session.params.language[language]}>
+				{STUDY_SESSION_LANGUAGE_PRETTY_STRING[language]}
+			</ToggleButton>
+		{/snippet}
+		<Labeled label="Language">
+			<ButtonGroup class="mx-auto">
+				{@render languageCheckbox(StudySessionLanguage.ENG_TO_JAP)}
+				{@render languageCheckbox(StudySessionLanguage.JAP_TO_ENG)}
+			</ButtonGroup>
+		</Labeled>
 	</div>
 	<!-- Buttons -->
 	<div class="flex flex-col flex-nowrap gap-2 px-1 py-3">
@@ -104,3 +136,8 @@
 		</Button>
 	</div>
 </main>
+
+<ErrorsFeed
+	bind:this={errorFeed}
+	autoDismissTimeoutMs={5000}
+/>
