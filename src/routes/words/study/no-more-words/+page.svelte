@@ -16,18 +16,21 @@
 	}
 </script>
 
-<main class="h-screen w-screen overflow-auto">
-	<Button
-		color="primary"
-		onclick={newSession}
-	>
-		New session
-	</Button>
-	<p>or</p>
-	<Button
-		color="primary"
-		href={resolve("/")}
-	>
-		Home
-	</Button>
+<main class="flex h-screen w-screen flex-col items-center justify-center gap-7 overflow-auto">
+	<h3 class="text-4xl font-semibold">No more words!</h3>
+	<div class="flex flex-col items-center justify-center gap-1">
+		<Button
+			color="primary"
+			onclick={newSession}
+		>
+			New session
+		</Button>
+		<p>or</p>
+		<Button
+			color="primary"
+			href={resolve("/")}
+		>
+			Home
+		</Button>
+	</div>
 </main>
