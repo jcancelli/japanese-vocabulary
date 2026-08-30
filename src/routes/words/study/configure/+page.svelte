@@ -20,7 +20,7 @@
 		WordStudySessionStep,
 	} from "$lib/study_session"
 	import { resolve } from "$app/paths"
-	import { goto } from "$app/navigation"
+	import { beforeNavigate, goto } from "$app/navigation"
 	import ButtonGroup from "$lib/components/ButtonGroup.svelte"
 	import ToggleButton from "$lib/components/ToggleButton.svelte"
 	import ErrorsFeed from "$lib/components/ErrorsFeed.svelte"
@@ -33,6 +33,21 @@
 
 	let errorFeed: ErrorsFeed
 
+	// Keep step value in sync
+	beforeNavigate((navigation) => {
+		if (!navigation.to) {
+			return
+		}
+		switch (navigation.to.route.id) {
+			case "/words/study/session":
+				session.step = WordStudySessionStep.STUDY
+				break
+			case "/words/study/no-more-words":
+				session.step = WordStudySessionStep.FINISHED
+				break
+		}
+	})
+
 	async function startSession() {
 		if (
 			!session.params.language[StudySessionLanguage.ENG_TO_JAP]
@@ -44,11 +59,9 @@
 
 		session.words = await getStudySessionWords(session.params)
 		if (session.words.length === 0) {
-			session.step = WordStudySessionStep.FINISHED
 			await goto(resolve("/words/study/no-more-words"))
 			return
 		}
-		session.step = WordStudySessionStep.STUDY
 		await goto(resolve("/words/study/session"))
 	}
 </script>

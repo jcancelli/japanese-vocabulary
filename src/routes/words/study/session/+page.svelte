@@ -6,7 +6,9 @@
 	} from "$lib/study_session"
 	import AnswerPage from "./AnswerPage.svelte"
 	import QuestionPage from "./QuestionPage.svelte"
-	import { goto } from "$app/navigation"
+	import HomeIcon from "flowbite-svelte-icons/HomeOutline.svelte"
+	import ConfigureIcon from "flowbite-svelte-icons/CogOutline.svelte"
+	import { beforeNavigate, goto } from "$app/navigation"
 	import { resolve } from "$app/paths"
 
 	const session = getWordStudySessionContext()
@@ -14,6 +16,21 @@
 	if (session.step !== WordStudySessionStep.STUDY) {
 		await goto(resolve("/words/study/configure"))
 	}
+
+	// Keep step value in sync
+	beforeNavigate((navigation) => {
+		if (!navigation.to) {
+			return
+		}
+		switch (navigation.to.route.id) {
+			case "/words/study/configure":
+				session.step = WordStudySessionStep.CONFIGURE
+				break
+			case "/words/study/no-more-words":
+				session.step = WordStudySessionStep.FINISHED
+				break
+		}
+	})
 
 	let word = $derived(session.words[0])
 	let language = $state(randomLanguage())
@@ -43,7 +60,6 @@
 	function onNextWord() {
 		if (session.words.length === 1) {
 			session.words.splice(0, 1)
-			session.step = WordStudySessionStep.FINISHED
 			goto(resolve("/words/study/no-more-words"))
 			return
 		}
@@ -53,6 +69,13 @@
 		language = randomLanguage()
 	}
 </script>
+
+<div class="fixed top-4 right-4 flex flex-row gap-2">
+	<a href={resolve("/words/study/configure")}>
+		<ConfigureIcon class="size-8" />
+	</a>
+	<a href={resolve("/")}><HomeIcon class="size-8" /></a>
+</div>
 
 {#if !hasAnswered}
 	<QuestionPage

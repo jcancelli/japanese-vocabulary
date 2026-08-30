@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from "$app/navigation"
+	import { beforeNavigate, goto } from "$app/navigation"
 	import { resolve } from "$app/paths"
 	import { getWordStudySessionContext, WordStudySessionStep } from "$lib/study_session"
 	import { Button } from "flowbite-svelte"
@@ -10,10 +10,17 @@
 		await goto(resolve("/words/study/configure"))
 	}
 
-	function newSession() {
-		session.step = WordStudySessionStep.CONFIGURE
-		goto(resolve("/words/study/configure"))
-	}
+	// Keep step value in sync
+	beforeNavigate((navigation) => {
+		if (!navigation.to) {
+			return
+		}
+		switch (navigation.to.route.id) {
+			case "/words/study/configure":
+				session.step = WordStudySessionStep.CONFIGURE
+				break
+		}
+	})
 </script>
 
 <main class="flex h-screen w-screen flex-col items-center justify-center gap-7 overflow-auto">
@@ -21,7 +28,7 @@
 	<div class="flex flex-col items-center justify-center gap-1">
 		<Button
 			color="primary"
-			onclick={newSession}
+			href={resolve("/words/study/configure")}
 		>
 			New session
 		</Button>
