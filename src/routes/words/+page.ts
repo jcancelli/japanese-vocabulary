@@ -11,6 +11,6 @@ export const load: PageLoad = async () => {
 			words,
 		}
 	} catch (err: any) {
-		error(404, err)
+		error(500, err)
 	}
 }
