@@ -87,5 +87,5 @@ db.version(1).stores({
 	kanjis: "id, kanji, *onyomi, *kunyomi, *nanori, meanings, jlptLevel, difficulty, lastStudiedAt, *tags",
 	relatedWords: "++, wordId, relatedId",
 	relatedKanjis: "++, kanjiId, relatedId",
-	relatedWordKanjis: "++, wordId, kanjiId",
+	relatedWordsKanjis: "++, wordId, kanjiId",
 })
