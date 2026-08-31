@@ -1,12 +1,14 @@
 <script lang="ts">
-	import { getAllWords } from "$lib/database/words"
 	import Fuse from "fuse.js"
 	import SearchInput from "flowbite-svelte/Search.svelte"
 	import HomeIcon from "flowbite-svelte-icons/HomeSolid.svelte"
 	import NewItemWidget from "$lib/components/NewItemWidget.svelte"
 	import { resolve } from "$app/paths"
+	import type { PageProps } from "./$types"
 
-	const words = $state(await getAllWords())
+	let { data }: PageProps = $props()
+
+	const words = $derived(data.words)
 
 	let searchInput = $state("")
 
