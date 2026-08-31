@@ -9,7 +9,7 @@
 	let { children, buttons }: KanjiPageProps = $props()
 </script>
 
-<div class="grid h-screen w-screen grid-cols-1 grid-rows-[1fr_min-content]">
+<div class="grid h-screen w-screen grid-cols-1 grid-rows-[1fr_min-content] overflow-auto">
 	<main class="flex flex-col gap-6 overflow-auto p-6">
 		{@render children()}
 	</main>
