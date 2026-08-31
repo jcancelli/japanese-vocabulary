@@ -9,6 +9,15 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
 ## TODO
 
 - Implement kanjis
+    - Implement related words input
+    - Implement related kanjis input
+    - /new route
+    - /view route
+    - /edit route
+    - /study routes
+    - Add input for related kanjis to word pages
+    - Display related kanjis in view word pages
+- Implement kanji drawing
 - Move db operations into transactions
 - Add navigation to new/edit/view word/kanji pages and remove "Cancel" buttons
 - Add dark mode styling
@@ -16,3 +25,5 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
 - Add error pages
 - Add alternative answers to the correct page
 - Add export/import database to settings
+- Maybe rework difficulty input
+- Probe text-to-speech for japanese pronounciation
