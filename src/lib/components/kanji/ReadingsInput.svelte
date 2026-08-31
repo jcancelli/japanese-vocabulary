@@ -75,7 +75,7 @@
 		</Button>
 	</div>
 	<!-- Entries -->
-	<div class="mt-4 grid grid-cols-[1fr_1fr_2.4rem] gap-y-2">
+	<div class="mt-4 grid grid-cols-[1fr_min-content] gap-y-2">
 		{#each value as entry, i}
 			<p>{entry}</p>
 			<div>
