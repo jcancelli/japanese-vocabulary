@@ -10,7 +10,7 @@
 	import WordPage from "../WordPage.svelte"
 	import type { WordDTO } from "$lib/dto.svelte"
 	import { goto } from "$app/navigation"
-	import { createWord } from "$lib/database"
+	import { createWord } from "$lib/database/words"
 	import type { ZodObject } from "zod"
 	import type { Word } from "$lib/model"
 	import { resolve } from "$app/paths"

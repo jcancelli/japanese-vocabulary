@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { WordMeaning as WordMeaningDTO } from "$lib/model"
+	import type { WordMeaning } from "$lib/model"
 	import FloatingLabelInput from "flowbite-svelte/FloatingLabelInput.svelte"
 	import Helper from "flowbite-svelte/Helper.svelte"
 	import Button from "flowbite-svelte/Button.svelte"
 	import CloseButton from "flowbite-svelte/CloseButton.svelte"
 	import PlusIcon from "flowbite-svelte-icons/PlusOutline.svelte"
 	import { WordMeaningSchema } from "$lib/schema"
-	import { mapWordMeaningDataToDTO } from "$lib/database"
+	import { WordMeaningDTO } from "$lib/dto.svelte"
 
 	export interface MeaningsInputProps {
 		value: WordMeaningDTO[]
@@ -16,7 +16,7 @@
 
 	let { value = $bindable(), disabled, ...props }: MeaningsInputProps = $props()
 
-	let newEntry: WordMeaningDTO = $state({
+	let newEntry: WordMeaning = $state({
 		meaning: "",
 		note: "",
 	})
@@ -48,7 +48,7 @@
 			return
 		}
 
-		value.push(mapWordMeaningDataToDTO(result.data))
+		value.push(WordMeaningDTO.fromInterface(result.data))
 
 		clearNewEntry()
 		clearError()

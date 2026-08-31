@@ -9,7 +9,7 @@ export const JLPT_LEVEL_PRETTY_STRING = {
 	[JLPTLevel.N5]: "N5",
 } as const
 
-export const WORD_DIFFICULTY_PRETTY_STRING = {
+export const DIFFICULTY_PRETTY_STRING = {
 	[Difficulty.DONT_KNOW]: "Don't know",
 	[Difficulty.KINDA_DONT_KNOW]: "Kinda don't know",
 	[Difficulty.KINDA_KNOW]: "Kinda know",

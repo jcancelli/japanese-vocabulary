@@ -2,20 +2,20 @@
 	import { resolve } from "$app/paths"
 	import { JLPT_LEVEL_COLOR } from "$lib/colors"
 	import Labeled from "$lib/components/Labeled.svelte"
-	import { getAllRelatedWords } from "$lib/database"
-	import { VerbDTO } from "$lib/dto.svelte"
+	import { VerbDTO, WordDTO } from "$lib/dto.svelte"
 	import {
 		JLPT_LEVEL_PRETTY_STRING,
 		VERB_TYPE_PRETTY_STRING,
-		WORD_DIFFICULTY_PRETTY_STRING,
+		DIFFICULTY_PRETTY_STRING,
 	} from "$lib/strings"
 	import ViewWordPage from "../ViewWordPage.svelte"
 
 	export interface ViewNounPageProps {
 		word: VerbDTO
+		relatedWords: WordDTO[]
 	}
 
-	let { word }: ViewNounPageProps = $props()
+	let { word, relatedWords }: ViewNounPageProps = $props()
 </script>
 
 <ViewWordPage {word}>
@@ -58,7 +58,7 @@
 		</Labeled>
 		<!-- Difficulty -->
 		<Labeled label="Difficulty">
-			<p>{WORD_DIFFICULTY_PRETTY_STRING[word.difficulty]}</p>
+			<p>{DIFFICULTY_PRETTY_STRING[word.difficulty]}</p>
 		</Labeled>
 		<!-- Meanings -->
 		<Labeled
@@ -89,21 +89,19 @@
 			label="Related words"
 			class="col-span-2"
 		>
-			{#await getAllRelatedWords(word.id) then relatedWords}
-				{#each relatedWords as relatedWord}
-					<a
-						href={resolve("/words/view/[wordId]", { wordId: relatedWord.id })}
-						class="block cursor-pointer py-1 hover:underline"
-					>
-						{relatedWord.primaryWriting}
-						{#if relatedWord.primaryMeaning}
-							({relatedWord.primaryMeaning.toLowerCase()})
-						{/if}
-					</a>
-				{:else}
-					<p class="text-center text-neutral-400">No related word</p>
-				{/each}
-			{/await}
+			{#each relatedWords as relatedWord}
+				<a
+					href={resolve("/words/view/[wordId]", { wordId: relatedWord.id })}
+					class="block cursor-pointer py-1 hover:underline"
+				>
+					{relatedWord.primaryWriting}
+					{#if relatedWord.primaryMeaning}
+						({relatedWord.primaryMeaning.toLowerCase()})
+					{/if}
+				</a>
+			{:else}
+				<p class="text-center text-neutral-400">No related word</p>
+			{/each}
 		</Labeled>
 		<!-- Tags -->
 		<Labeled

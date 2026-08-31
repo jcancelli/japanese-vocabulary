@@ -6,7 +6,7 @@
 	import CloseButton from "flowbite-svelte/CloseButton.svelte"
 	import PlusIcon from "flowbite-svelte-icons/PlusOutline.svelte"
 	import { ExampleSentenceSchema } from "$lib/schema"
-	import { mapExampleSentenceDataToDTO } from "$lib/database"
+	import { ExampleSentenceDTO } from "$lib/dto.svelte"
 
 	export interface ExampleSentencesInputProps {
 		value: ExampleSentence[]
@@ -48,7 +48,7 @@
 			return
 		}
 
-		value.push(mapExampleSentenceDataToDTO(result.data))
+		value.push(ExampleSentenceDTO.fromInterface(result.data))
 
 		clearNewEntry()
 		clearError()

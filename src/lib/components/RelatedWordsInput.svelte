@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { getAllWords, getWord } from "$lib/database"
+	import { getAllWords, getWords } from "$lib/database/words"
 	import type { UUIDv4 } from "$lib/model"
-	import { liveQuery } from "dexie"
 	import Fuse from "fuse.js"
 	import Search from "flowbite-svelte/Search.svelte"
 	import Listgroup from "flowbite-svelte/Listgroup.svelte"
@@ -16,9 +15,9 @@
 
 	let searchTerm = $state("")
 
-	const allWords = $derived(liveQuery(getAllWords))
+	const allWords = $derived(await getAllWords())
 	const fuse = $derived(
-		new Fuse($allWords ?? [], {
+		new Fuse(allWords ?? [], {
 			keys: ["kanji", "kana", "meanings.meaning"],
 		}),
 	)
@@ -31,7 +30,7 @@
 			.slice(0, 5),
 	)
 
-	const relatedWordsPromise = $derived(Promise.all(relatedWordsIds.values().map(getWord)))
+	const relatedWords = $derived(await getWords(relatedWordsIds))
 
 	function addRelatedWord(entryId: UUIDv4) {
 		if (relatedWordsIds.includes(entryId)) {
@@ -69,16 +68,14 @@
 	</div>
 	<!-- Entries -->
 	<div class="grid grid-cols-[1fr_2.4rem] items-center p-4">
-		{#await relatedWordsPromise then relatedWords}
-			{#each relatedWords as relatedWord, i (relatedWord.id)}
-				<p class="text-sm">{relatedWord.primaryWriting} ({relatedWord.primaryMeaning})</p>
-				<CloseButton
-					onclick={() => relatedWordsIds.splice(i, 1)}
-					class="w-fit"
-				/>
-			{:else}
-				<p class="col-span-2 text-center">No entry</p>
-			{/each}
-		{/await}
+		{#each relatedWords as relatedWord, i (relatedWord.id)}
+			<p class="text-sm">{relatedWord.primaryWriting} ({relatedWord.primaryMeaning})</p>
+			<CloseButton
+				onclick={() => relatedWordsIds.splice(i, 1)}
+				class="w-fit"
+			/>
+		{:else}
+			<p class="col-span-2 text-center">No entry</p>
+		{/each}
 	</div>
 </div>

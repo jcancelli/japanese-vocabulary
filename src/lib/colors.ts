@@ -16,7 +16,7 @@ export const JLPT_LEVEL_COLOR = {
 	[JLPTLevel.N1]: "#610a6d",
 } as const
 
-export const WORD_DIFFICULTY_COLOR = {
+export const DIFFICULTY_COLOR = {
 	[Difficulty.DONT_KNOW]: "#ff0000",
 	[Difficulty.KINDA_DONT_KNOW]: "#ffb500",
 	[Difficulty.KINDA_KNOW]: "#ffff00",

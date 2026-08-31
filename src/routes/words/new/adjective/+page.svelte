@@ -6,7 +6,7 @@
 	import KanjiFragment from "$lib/components/forms/KanjiFragment.svelte"
 	import RelatedWordsFragment from "$lib/components/forms/RelatedWordsFragment.svelte"
 	import TagsFragment from "$lib/components/forms/TagsFragment.svelte"
-	import WordDifficultyFragment from "$lib/components/forms/WordDifficultyFragment.svelte"
+	import DifficultyFragment from "$lib/components/forms/DifficultyFragment.svelte"
 	import WordMeaningsFragment from "$lib/components/forms/WordMeaningsFragment.svelte"
 	import { AdjectiveDTO } from "$lib/dto.svelte"
 	import { AdjectiveSchema } from "$lib/schema"
@@ -46,7 +46,7 @@
 			error={errors.jlptLevel}
 		/>
 		<!-- Difficulty -->
-		<WordDifficultyFragment
+		<DifficultyFragment
 			bind:value={word.difficulty}
 			error={errors.difficulty}
 		/>

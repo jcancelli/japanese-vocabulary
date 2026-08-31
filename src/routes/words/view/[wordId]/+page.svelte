@@ -17,19 +17,35 @@
 	let { data }: PageProps = $props()
 
 	const word = $derived(data.word!)
+	const relatedWords = $derived(data.relatedWords)
 	const wordType = $derived(word.wordType)
 </script>
 
 {#if wordType === WordType.NOUN}
-	<ViewNounPage word={word as NounDTO} />
+	<ViewNounPage
+		word={word as NounDTO}
+		{relatedWords}
+	/>
 {:else if wordType === WordType.VERB}
-	<ViewVerbPage word={word as VerbDTO} />
+	<ViewVerbPage
+		word={word as VerbDTO}
+		{relatedWords}
+	/>
 {:else if wordType === WordType.ADVERB}
-	<ViewAdverbPage word={word as AdverbDTO} />
+	<ViewAdverbPage
+		word={word as AdverbDTO}
+		{relatedWords}
+	/>
 {:else if wordType === WordType.ADJECTIVE}
-	<ViewAdjectivePage word={word as AdjectiveDTO} />
+	<ViewAdjectivePage
+		word={word as AdjectiveDTO}
+		{relatedWords}
+	/>
 {:else if wordType === WordType.PRE_NOUN_ADJECTIVAL}
-	<ViewPreNounAdjectivalPage word={word as PreNounAdjectivalDTO} />
+	<ViewPreNounAdjectivalPage
+		word={word as PreNounAdjectivalDTO}
+		{relatedWords}
+	/>
 {:else}
 	UNKNOWN WORD TYPE
 {/if}

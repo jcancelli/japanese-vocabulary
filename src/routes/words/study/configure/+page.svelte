@@ -3,15 +3,12 @@
 	import Button from "flowbite-svelte/Button.svelte"
 	import Checkbox from "flowbite-svelte/Checkbox.svelte"
 	import Tags from "flowbite-svelte/Tags.svelte"
-	import StartIcon from "flowbite-svelte-icons/StarSolid.svelte"
 	import HomeIcon from "flowbite-svelte-icons/HomeOutline.svelte"
-	import { liveQuery } from "dexie"
-	import { getAllTags, getStudySessionWords } from "$lib/database"
-	import { JLPTLevel, WordDifficulty } from "$lib/model"
+	import { JLPTLevel, Difficulty } from "$lib/model"
 	import {
 		JLPT_LEVEL_PRETTY_STRING,
 		STUDY_SESSION_LANGUAGE_PRETTY_STRING,
-		WORD_DIFFICULTY_PRETTY_STRING,
+		DIFFICULTY_PRETTY_STRING,
 	} from "$lib/strings"
 	import {
 		getWordStudySessionContext,
@@ -26,10 +23,12 @@
 	import ErrorsFeed from "$lib/components/ErrorsFeed.svelte"
 	import RadioGroup from "$lib/components/RadioGroup.svelte"
 	import Label from "flowbite-svelte/Label.svelte"
+	import { getStudySessionWords } from "$lib/database/study_sessions"
+	import { getAllWordTags } from "$lib/database/words"
 
 	const session = getWordStudySessionContext()
 
-	const allTags = liveQuery(getAllTags)
+	const allTags = await getAllWordTags()
 
 	let errorFeed: ErrorsFeed
 
@@ -82,7 +81,7 @@
 		<Labeled label="Only tags">
 			<Tags
 				bind:value={session.params.tags.only}
-				availableTags={$allTags ?? []}
+				availableTags={allTags ?? []}
 				allowNewTags={false}
 				unique
 				showHelper
@@ -92,25 +91,25 @@
 		<Labeled label="Without tags">
 			<Tags
 				bind:value={session.params.tags.without}
-				availableTags={$allTags ?? []}
+				availableTags={allTags ?? []}
 				allowNewTags={false}
 				unique
 				showHelper
 			/>
 		</Labeled>
 		<!-- Difficulty -->
-		{#snippet difficultyCheckbox(difficulty: WordDifficulty)}
+		{#snippet difficultyCheckbox(difficulty: Difficulty)}
 			<Checkbox bind:checked={session.params.difficulty[difficulty]}>
-				{WORD_DIFFICULTY_PRETTY_STRING[difficulty]}
+				{DIFFICULTY_PRETTY_STRING[difficulty]}
 			</Checkbox>
 		{/snippet}
 		<Labeled label="Difficulty">
 			<div class="mx-auto flex w-fit flex-col items-start justify-center gap-2">
-				{@render difficultyCheckbox(WordDifficulty.DONT_KNOW)}
-				{@render difficultyCheckbox(WordDifficulty.KINDA_DONT_KNOW)}
-				{@render difficultyCheckbox(WordDifficulty.KINDA_KNOW)}
-				{@render difficultyCheckbox(WordDifficulty.KNOW)}
-				{@render difficultyCheckbox(WordDifficulty.UNFORGETTABLE)}
+				{@render difficultyCheckbox(Difficulty.DONT_KNOW)}
+				{@render difficultyCheckbox(Difficulty.KINDA_DONT_KNOW)}
+				{@render difficultyCheckbox(Difficulty.KINDA_KNOW)}
+				{@render difficultyCheckbox(Difficulty.KNOW)}
+				{@render difficultyCheckbox(Difficulty.UNFORGETTABLE)}
 			</div>
 		</Labeled>
 		<!-- JLPT level -->

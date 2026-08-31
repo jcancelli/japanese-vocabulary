@@ -1,7 +1,7 @@
 import { error } from "@sveltejs/kit"
 import type { PageLoad } from "./$types"
 import { UUIDv4Schema } from "$lib/schema"
-import { getWord } from "$lib/database"
+import { getWord } from "$lib/database/words"
 import { browser } from "$app/env"
 
 export const load: PageLoad = async ({ params }) => {

@@ -1,18 +1,17 @@
 <script lang="ts">
-	import { getAllWords } from "$lib/database"
-	import { liveQuery } from "dexie"
+	import { getAllWords } from "$lib/database/words"
 	import Fuse from "fuse.js"
 	import SearchInput from "flowbite-svelte/Search.svelte"
 	import HomeIcon from "flowbite-svelte-icons/HomeSolid.svelte"
 	import NewItemWidget from "$lib/components/NewItemWidget.svelte"
 	import { resolve } from "$app/paths"
 
-	const words = $derived(liveQuery(getAllWords))
+	const words = $state(await getAllWords())
 
 	let searchInput = $state("")
 
 	const fuse = $derived(
-		new Fuse($words ?? [], {
+		new Fuse(words, {
 			includeScore: true,
 			keys: ["kanji", "kana", "meanings.meaning"],
 		}),

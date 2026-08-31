@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { WORD_DIFFICULTY_COLOR } from "$lib/colors"
-	import { updateWord } from "$lib/database"
+	import { DIFFICULTY_COLOR } from "$lib/colors"
+	import { updateWord } from "$lib/database/words"
 	import type { WordDTO } from "$lib/dto.svelte"
-	import { WordDifficulty } from "$lib/model"
+	import { Difficulty } from "$lib/model"
 	import { StudySessionLanguage } from "$lib/study_session"
 
 	export interface AnswerPageProps {
@@ -37,7 +37,7 @@
 		throw new Error("Invalid language")
 	})
 
-	async function updateDifficulty(difficulty: WordDifficulty) {
+	async function updateDifficulty(difficulty: Difficulty) {
 		if (difficulty !== word.difficulty) {
 			word.difficulty = difficulty
 			word.lastStudiedAt = new Date()
@@ -108,24 +108,24 @@
 	<div class="relative grid grid-cols-5 drop-shadow">
 		<p class="absolute -top-8 w-full text-center font-semibold text-white">Update difficulty</p>
 
-		{#snippet difficultyButton(difficulty: WordDifficulty)}
+		{#snippet difficultyButton(difficulty: Difficulty)}
 			{@const isCurrentDifficulty = difficulty === word.difficulty}
 			<button
 				class="
 					h-15 cursor-pointer border-black text-sm wrap-break-word
 					text-black hover:scale-105 active:scale-105
 				"
-				style:background-color={WORD_DIFFICULTY_COLOR[difficulty]}
+				style:background-color={DIFFICULTY_COLOR[difficulty]}
 				class:border-3={isCurrentDifficulty}
 				onclick={() => updateDifficulty(difficulty)}
 			>
 				{difficulty}
 			</button>
 		{/snippet}
-		{@render difficultyButton(WordDifficulty.DONT_KNOW)}
-		{@render difficultyButton(WordDifficulty.KINDA_DONT_KNOW)}
-		{@render difficultyButton(WordDifficulty.KINDA_KNOW)}
-		{@render difficultyButton(WordDifficulty.KNOW)}
-		{@render difficultyButton(WordDifficulty.UNFORGETTABLE)}
+		{@render difficultyButton(Difficulty.DONT_KNOW)}
+		{@render difficultyButton(Difficulty.KINDA_DONT_KNOW)}
+		{@render difficultyButton(Difficulty.KINDA_KNOW)}
+		{@render difficultyButton(Difficulty.KNOW)}
+		{@render difficultyButton(Difficulty.UNFORGETTABLE)}
 	</div>
 </main>

@@ -7,7 +7,7 @@
 	import TagsFragment from "$lib/components/forms/TagsFragment.svelte"
 	import VerbTransitivityFragment from "$lib/components/forms/VerbTransitivityFragment.svelte"
 	import VerbTypeFragment from "$lib/components/forms/VerbTypeFragment.svelte"
-	import WordDifficultyFragment from "$lib/components/forms/WordDifficultyFragment.svelte"
+	import DifficultyFragment from "$lib/components/forms/DifficultyFragment.svelte"
 	import WordMeaningsFragment from "$lib/components/forms/WordMeaningsFragment.svelte"
 	import type { VerbDTO } from "$lib/dto.svelte"
 	import { VerbSchema } from "$lib/schema"
@@ -56,7 +56,7 @@
 			error={errors.jlptLevel}
 		/>
 		<!-- Difficulty -->
-		<WordDifficultyFragment
+		<DifficultyFragment
 			bind:value={word.difficulty}
 			error={errors.difficulty}
 		/>

@@ -1,24 +1,24 @@
 <script lang="ts">
 	import Helper from "flowbite-svelte/Helper.svelte"
-	import WordDifficultyInput from "../WordDifficultyInput.svelte"
-	import type { WordDifficulty } from "$lib/model"
+	import DifficultyInput from "../DifficultyInput.svelte"
+	import type { Difficulty } from "$lib/model"
 	import Labeled from "../Labeled.svelte"
 
-	export interface WordDifficultyFragment {
-		value: WordDifficulty
+	export interface DifficultyFragment {
+		value: Difficulty
 		error?: string | null | undefined
 		disabled?: boolean
 		class?: string
 	}
 
-	let { value = $bindable(), error, disabled, ...props }: WordDifficultyFragment = $props()
+	let { value = $bindable(), error, disabled, ...props }: DifficultyFragment = $props()
 </script>
 
 <Labeled
 	label="Difficulty"
 	{...props}
 >
-	<WordDifficultyInput
+	<DifficultyInput
 		bind:value
 		{disabled}
 	/>
