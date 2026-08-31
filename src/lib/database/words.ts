@@ -1,10 +1,15 @@
 // TODO: move db operations into transactions
 
 import type { WordDTO } from "$lib/dto.svelte"
-import { WordType, type UUIDv4, type Word } from "$lib/model"
+import { stripId, WordType, type UUIDv4, type Word } from "$lib/model"
 import { db, type AdjectiveData, type VerbData, type WordData } from "./database"
 import { mapWordDataToWordDTO, mapWordToWordData } from "./mappings"
-import { getRelatedKanjiIdsForWord, getRelatedWordIdsForWord } from "./relationships"
+import {
+	getRelatedKanjiIdsForWord,
+	getRelatedWordIdsForWord,
+	updateKanjiRelationshipsForWord,
+	updateWordRelationshipsForWord,
+} from "./relationships"
 
 export async function getWord(wordId: UUIDv4): Promise<WordDTO> {
 	return await db.words.get(wordId).then(async (word) => {
@@ -124,60 +129,37 @@ export async function deleteWord(wordId: UUIDv4): Promise<void> {
 	])
 }
 
-// TODO: re-implement updateWord
 export async function updateWord(word: Word): Promise<void> {
-	throw new Error("TODO")
-	/*// Update base word
-	await db.words.update(word.id, stripId(mapWordToWordData(word)))
+	const [wordData, , , verbData, adjectiveData] = mapWordToWordData(word)
 
-	// Update word relationships
-	const oldRelatedWordsIds = await db.relatedWords
-		.where("wordId")
-		.equals(word.id)
-		.toArray()
-		.then((relationships) => {
-			return new Set(relationships.map((relationship) => relationship.relatedId))
-		})
-	const newRelatedWordsIds = new Set(word.relatedWords)
-	const relationshipsToCreateIds = Array.from(newRelatedWordsIds.difference(oldRelatedWordsIds))
-	const relationshipsToDeleteIds = Array.from(oldRelatedWordsIds.difference(newRelatedWordsIds))
-	// Delete remove relationships
-	await db.relatedWords
-		.where("wordId")
-		.anyOf(relationshipsToDeleteIds)
-		.or("relatedId")
-		.anyOf(relationshipsToDeleteIds)
-		.delete()
-	// Create new relationships
-	await db.relatedWords.bulkAdd(
-		relationshipsToCreateIds.flatMap((id) => {
-			return [
-				{ wordId: word.id, relatedId: id },
-				{ wordId: id, relatedId: word.id },
-			]
-		}),
-	)
+	await Promise.all([
+		db.words.update(word.id, stripId(wordData)),
+		updateWordRelationshipsForWord(word),
+		updateKanjiRelationshipsForWord(word),
+	])
 
 	// Update wordType specific data
 	switch (word.wordType) {
 		case WordType.NOUN:
+		case WordType.ADVERB:
+		case WordType.PRE_NOUN_ADJECTIVAL:
+			// NO-OP
 			break
 		case WordType.VERB:
-			await db.verbs.update(word.id, stripId(mapVerbToVerbData(word as Verb)))
-			break
-		case WordType.ADVERB:
+			if (!verbData) {
+				throw new Error("Trying to update verb but no verb data was provided")
+			}
+			await db.verbs.update(verbData.id, stripId(verbData))
 			break
 		case WordType.ADJECTIVE:
-			await db.adjectives.update(
-				word.id,
-				stripId(mapAdjectiveToAdjectiveData(word as Adjective)),
-			)
-			break
-		case WordType.PRE_NOUN_ADJECTIVAL:
+			if (!adjectiveData) {
+				throw new Error("Trying to update adjective but no adjective data was provided")
+			}
+			await db.adjectives.update(adjectiveData.id, stripId(adjectiveData))
 			break
 		default:
 			throw new Error()
-	}*/
+	}
 }
 
 export async function getAllWordTags(): Promise<string[]> {

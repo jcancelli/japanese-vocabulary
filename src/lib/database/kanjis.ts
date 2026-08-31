@@ -1,10 +1,15 @@
 // TODO: move db operations into transactions
 
 import type { KanjiDTO } from "$lib/dto.svelte"
-import type { Kanji, UUIDv4 } from "$lib/model"
+import { stripId, type Kanji, type UUIDv4 } from "$lib/model"
 import { db, type KanjiData } from "./database"
 import { mapKanjiDataToKanjiDTO, mapKanjiToKanjiData } from "./mappings"
-import { getRelatedKanjiIdsForKanji, getRelatedWordIdsForKanji } from "./relationships"
+import {
+	getRelatedKanjiIdsForKanji,
+	getRelatedWordIdsForKanji,
+	updateKanjiRelationshipsForKanji,
+	updateWordRelationshipsForKanji,
+} from "./relationships"
 
 export async function getKanji(kanjiId: UUIDv4): Promise<KanjiDTO> {
 	return await db.kanjis.get(kanjiId).then(async (kanji) => {
@@ -61,9 +66,14 @@ export async function deleteKanji(kanjiId: UUIDv4): Promise<void> {
 	])
 }
 
-// TODO: implement updateKanji
 export async function updateKanji(kanji: Kanji): Promise<void> {
-	throw new Error("TODO")
+	const [kanjiData] = mapKanjiToKanjiData(kanji)
+
+	await Promise.all([
+		db.kanjis.update(kanji.id, stripId(kanjiData)),
+		updateWordRelationshipsForKanji(kanji),
+		updateKanjiRelationshipsForKanji(kanji),
+	])
 }
 
 export async function getAllKanjiTags(): Promise<string[]> {
