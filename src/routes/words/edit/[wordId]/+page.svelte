@@ -16,7 +16,7 @@
 
 	let { data }: PageProps = $props()
 
-	const word = $derived(data.word!)
+	const word = $derived(data.word)
 	const wordType = $derived(word.wordType)
 </script>
 
