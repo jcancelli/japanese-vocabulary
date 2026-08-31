@@ -1,4 +1,4 @@
-import { JLPTLevel, WordDifficulty, WordType } from "./model"
+import { JLPTLevel, Difficulty, WordType } from "./model"
 
 export const WORD_TYPE_COLOR = {
 	[WordType.NOUN]: "#d791e6",
@@ -17,9 +17,9 @@ export const JLPT_LEVEL_COLOR = {
 } as const
 
 export const WORD_DIFFICULTY_COLOR = {
-	[WordDifficulty.DONT_KNOW]: "#ff0000",
-	[WordDifficulty.KINDA_DONT_KNOW]: "#ffb500",
-	[WordDifficulty.KINDA_KNOW]: "#ffff00",
-	[WordDifficulty.KNOW]: "#b5ff00",
-	[WordDifficulty.UNFORGETTABLE]: "#00ff00",
+	[Difficulty.DONT_KNOW]: "#ff0000",
+	[Difficulty.KINDA_DONT_KNOW]: "#ffb500",
+	[Difficulty.KINDA_KNOW]: "#ffff00",
+	[Difficulty.KNOW]: "#b5ff00",
+	[Difficulty.UNFORGETTABLE]: "#00ff00",
 } as const

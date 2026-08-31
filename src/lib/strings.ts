@@ -1,4 +1,4 @@
-import { AdjectiveType, JLPTLevel, VerbType, WordDifficulty, WordType } from "./model"
+import { AdjectiveType, JLPTLevel, VerbType, Difficulty, WordType } from "./model"
 import { StudySessionLanguage } from "./study_session"
 
 export const JLPT_LEVEL_PRETTY_STRING = {
@@ -10,11 +10,11 @@ export const JLPT_LEVEL_PRETTY_STRING = {
 } as const
 
 export const WORD_DIFFICULTY_PRETTY_STRING = {
-	[WordDifficulty.DONT_KNOW]: "Don't know",
-	[WordDifficulty.KINDA_DONT_KNOW]: "Kinda don't know",
-	[WordDifficulty.KINDA_KNOW]: "Kinda know",
-	[WordDifficulty.KNOW]: "Know",
-	[WordDifficulty.UNFORGETTABLE]: "Unforgettable",
+	[Difficulty.DONT_KNOW]: "Don't know",
+	[Difficulty.KINDA_DONT_KNOW]: "Kinda don't know",
+	[Difficulty.KINDA_KNOW]: "Kinda know",
+	[Difficulty.KNOW]: "Know",
+	[Difficulty.UNFORGETTABLE]: "Unforgettable",
 } as const
 
 export const WORD_TYPE_PRETTY_STRING = {

@@ -2,13 +2,14 @@ export interface Word {
 	id: UUIDv4
 	wordType: WordType
 	jlptLevel: JLPTLevel
-	difficulty: WordDifficulty
+	difficulty: Difficulty
 	kanji?: string
 	kana: string
 	meanings: WordMeaning[]
 	examples: ExampleSentence[]
 	tags: string[]
 	relatedWords: UUIDv4[]
+	relatedKanjis: UUIDv4[]
 	lastStudiedAt: Date
 }
 
@@ -35,6 +36,21 @@ export interface PreNounAdjectival extends Word {
 	wordType: WordType.PRE_NOUN_ADJECTIVAL
 }
 
+export interface Kanji {
+	id: UUIDv4
+	kanji: string
+	onyomi: string[]
+	kunyomi: string[]
+	nanori: string[]
+	meanings: KanjiMeaning[]
+	jlptLevel: JLPTLevel
+	difficulty: Difficulty
+	lastStudiedAt: Date
+	tags: string[]
+	relatedWords: UUIDv4[]
+	relatedKanjis: UUIDv4[]
+}
+
 export type UUIDv4 = `${string}-${string}-${string}-${string}-${string}`
 
 export enum WordType {
@@ -53,7 +69,7 @@ export enum JLPTLevel {
 	N1 = 1,
 }
 
-export enum WordDifficulty {
+export enum Difficulty {
 	UNFORGETTABLE = 1,
 	KNOW = 2,
 	KINDA_KNOW = 3,
@@ -79,6 +95,11 @@ export enum AdjectiveType {
 }
 
 export interface WordMeaning {
+	meaning: string
+	note?: string
+}
+
+export interface KanjiMeaning {
 	meaning: string
 	note?: string
 }
