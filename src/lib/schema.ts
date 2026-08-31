@@ -1,6 +1,6 @@
 import z from "zod"
 import { AdjectiveType, JLPTLevel, VerbType, Difficulty, WordType, type UUIDv4 } from "./model"
-import { kanaStringRegex, kanjiKanaStringRegex } from "./japanese/regex"
+import { hiraganaStringRegex, kanaStringRegex, kanjiKanaStringRegex } from "./japanese/regex"
 import { capitalizeString } from "./strings"
 
 export const UUIDv4Schema = z.custom<UUIDv4>((value) => {
@@ -14,6 +14,10 @@ export const KanjiStringSchema = z
 	.trim()
 	.regex(kanjiKanaStringRegex, "Non kanji/kana character found")
 export const KanaStringSchema = z.string().trim().regex(kanaStringRegex, "Non-kana character found")
+export const HiraganaStringSchema = z
+	.string()
+	.trim()
+	.regex(hiraganaStringRegex, "Non-hiragana character found")
 export const VerbTypeSchema = z.enum(VerbType, "Invalid verb type")
 export const VerbTransitivitySchema = z.object({
 	transitive: z.boolean(),
@@ -84,7 +88,7 @@ export const PreNounAdjectivalSchema = WordSchema.extend({
 })
 export const KanjiSchema = z.object({
 	id: UUIDv4Schema,
-	kanji: KanaStringSchema.nonempty("Empty field"),
+	kanji: KanjiStringSchema.nonempty("Empty field"),
 	onyomi: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate on'yomi"),
 	kunyomi: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate kun'yomi"),
 	nanori: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate naori"),
