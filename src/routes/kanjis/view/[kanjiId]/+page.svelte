@@ -104,9 +104,9 @@
 					href={resolve("/kanjis/view/[kanjiId]", { kanjiId: relatedKanji.id })}
 					class="block cursor-pointer py-1 hover:underline"
 				>
-					{relatedKanji.primaryWriting}
-					{#if relatedKanji.primaryMeaning}
-						({relatedKanji.primaryMeaning.toLowerCase()})
+					{relatedKanji.kanji}
+					{#if relatedKanji.meanings[0]}
+						({relatedKanji.meanings[0].meaning.toLowerCase()})
 					{/if}
 				</a>
 			{:else}
