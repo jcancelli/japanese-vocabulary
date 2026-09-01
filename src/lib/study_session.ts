@@ -5,51 +5,6 @@ import type { WordDTO } from "./dto.svelte"
 export const [getWordStudySessionContext, setWordStudySessionSessionContext] =
 	createContext<WordStudySession>()
 
-export const WORD_STUDY_SESSION_LOCAL_STORAGE_KEY = "wordStudySession"
-
-export const wordStudySessionLocalStorage = {
-	get params(): WordStudySessionParams {
-		const key = `${WORD_STUDY_SESSION_LOCAL_STORAGE_KEY}.params`
-		const val = localStorage.getItem(key)
-		if (val) {
-			return JSON.parse(val)
-		}
-		return {
-			tags: {
-				only: [],
-				without: [],
-			},
-			jlptLevel: {
-				[JLPTLevel.N5]: false,
-				[JLPTLevel.N4]: false,
-				[JLPTLevel.N3]: false,
-				[JLPTLevel.N2]: false,
-				[JLPTLevel.N1]: false,
-			},
-			difficulty: {
-				[Difficulty.DONT_KNOW]: false,
-				[Difficulty.KINDA_DONT_KNOW]: false,
-				[Difficulty.KINDA_KNOW]: false,
-				[Difficulty.KNOW]: false,
-				[Difficulty.UNFORGETTABLE]: false,
-			},
-			language: {
-				[StudySessionLanguage.ENG_TO_JAP]: false,
-				[StudySessionLanguage.JAP_TO_ENG]: false,
-			},
-			sort: {
-				by: WordStudySessionSortingField.DIFFICULTY,
-				order: "descending",
-			},
-		}
-	},
-
-	set params(value: WordStudySessionParams) {
-		const key = `${WORD_STUDY_SESSION_LOCAL_STORAGE_KEY}.params`
-		localStorage.setItem(key, JSON.stringify(value))
-	},
-}
-
 export interface WordStudySession {
 	params: WordStudySessionParams
 	words: WordDTO[]

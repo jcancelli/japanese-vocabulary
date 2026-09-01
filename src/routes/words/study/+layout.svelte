@@ -1,8 +1,6 @@
 <script lang="ts">
-	import {
-		setWordStudySessionSessionContext,
-		wordStudySessionLocalStorage,
-	} from "$lib/study_session"
+	import { storage } from "$lib/local_storage"
+	import { setWordStudySessionSessionContext } from "$lib/study_session"
 	import type { LayoutProps } from "./$types"
 
 	let { data, children }: LayoutProps = $props()
@@ -16,7 +14,7 @@
 	setWordStudySessionSessionContext(session)
 
 	$effect(() => {
-		wordStudySessionLocalStorage.params = session.params
+		storage.wordStudySession.params = session.params
 	})
 </script>
 

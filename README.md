@@ -15,7 +15,6 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
 - Consider "rarity" field, to sort words by most common to uncommon (better study the most common first)
 - Move db operations into transactions
 - Add dark mode styling
-- Improve local storage interface (versioning and stuff)
 - Add error pages
 - Add alternative answers to the correct page
 - Add export/import database to settings
