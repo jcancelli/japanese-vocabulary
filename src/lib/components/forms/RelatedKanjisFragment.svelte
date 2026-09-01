@@ -1,5 +1,5 @@
 <script lang="ts">
-	import RelatedKanjisInput from "$lib/components/kanji/RelatedKanjisInput.svelte"
+	import RelatedKanjisInput from "$lib/components/RelatedKanjisInput.svelte"
 	import Labeled from "$lib/components/Labeled.svelte"
 	import type { UUIDv4 } from "$lib/model"
 	import { Helper } from "flowbite-svelte"

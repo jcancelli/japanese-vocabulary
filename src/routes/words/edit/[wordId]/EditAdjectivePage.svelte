@@ -11,6 +11,7 @@
 	import type { AdjectiveDTO } from "$lib/dto.svelte"
 	import { AdjectiveSchema } from "$lib/schema"
 	import EditWordPage, { type Errors } from "../EditWordPage.svelte"
+	import RelatedKanjisFragment from "$lib/components/forms/RelatedKanjisFragment.svelte"
 
 	export interface EditAdjectivePageProps {
 		word: AdjectiveDTO
@@ -68,6 +69,11 @@
 		<RelatedWordsFragment
 			bind:value={word.relatedWords}
 			wordId={word.id}
+			error={errors.relatedWords}
+		/>
+		<!-- Related kanjis -->
+		<RelatedKanjisFragment
+			bind:value={word.relatedWords}
 			error={errors.relatedWords}
 		/>
 	{/snippet}

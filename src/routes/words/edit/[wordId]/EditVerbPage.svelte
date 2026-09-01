@@ -12,6 +12,7 @@
 	import type { VerbDTO } from "$lib/dto.svelte"
 	import { VerbSchema } from "$lib/schema"
 	import EditWordPage, { type Errors } from "../EditWordPage.svelte"
+	import RelatedKanjisFragment from "$lib/components/forms/RelatedKanjisFragment.svelte"
 
 	export interface EditVerbPageProps {
 		word: VerbDTO
@@ -74,6 +75,11 @@
 		<RelatedWordsFragment
 			bind:value={word.relatedWords}
 			wordId={word.id}
+			error={errors.relatedWords}
+		/>
+		<!-- Related kanjis -->
+		<RelatedKanjisFragment
+			bind:value={word.relatedWords}
 			error={errors.relatedWords}
 		/>
 	{/snippet}

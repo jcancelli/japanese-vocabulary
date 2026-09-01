@@ -10,8 +10,6 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
 
 - Implement kanjis
     - /study routes
-    - Add input for related kanjis to word pages
-    - Display related kanjis in view word pages
 - Implement counters
 - Implement kanji drawing
 - Consider "rarity" field, to sort words by most common to uncommon (better study the most common first)

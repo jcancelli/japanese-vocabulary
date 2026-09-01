@@ -2,16 +2,17 @@
 	import { resolve } from "$app/paths"
 	import { JLPT_LEVEL_COLOR } from "$lib/colors"
 	import Labeled from "$lib/components/Labeled.svelte"
-	import { AdverbDTO, WordDTO } from "$lib/dto.svelte"
+	import { AdverbDTO, KanjiDTO, WordDTO } from "$lib/dto.svelte"
 	import { JLPT_LEVEL_PRETTY_STRING, DIFFICULTY_PRETTY_STRING } from "$lib/strings"
 	import ViewWordPage from "../ViewWordPage.svelte"
 
 	export interface ViewAdverbPageProps {
 		word: AdverbDTO
 		relatedWords: WordDTO[]
+		relatedKanjis: KanjiDTO[]
 	}
 
-	let { word, relatedWords }: ViewAdverbPageProps = $props()
+	let { word, relatedWords, relatedKanjis }: ViewAdverbPageProps = $props()
 </script>
 
 <ViewWordPage {word}>
@@ -75,6 +76,25 @@
 				</a>
 			{:else}
 				<p class="text-center text-neutral-400">No related word</p>
+			{/each}
+		</Labeled>
+		<!-- Related kanjis -->
+		<Labeled
+			label="Related kanjis"
+			class="col-span-2"
+		>
+			{#each relatedKanjis as relatedKanji}
+				<a
+					href={resolve("/kanjis/view/[kanjiId]", { kanjiId: relatedKanji.id })}
+					class="block cursor-pointer py-1 hover:underline"
+				>
+					{relatedKanji.kanji}
+					{#if relatedKanji.meanings[0]}
+						({relatedKanji.meanings[0].meaning.toLowerCase()})
+					{/if}
+				</a>
+			{:else}
+				<p class="text-center text-neutral-400">No related kanjis</p>
 			{/each}
 		</Labeled>
 		<!-- Tags -->

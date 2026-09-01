@@ -18,6 +18,7 @@
 
 	const word = $derived(data.word)
 	const relatedWords = $derived(data.relatedWords)
+	const relatedKanjis = $derived(data.relatedKanjis)
 	const wordType = $derived(word.wordType)
 </script>
 
@@ -25,26 +26,31 @@
 	<ViewNounPage
 		word={word as NounDTO}
 		{relatedWords}
+		{relatedKanjis}
 	/>
 {:else if wordType === WordType.VERB}
 	<ViewVerbPage
 		word={word as VerbDTO}
 		{relatedWords}
+		{relatedKanjis}
 	/>
 {:else if wordType === WordType.ADVERB}
 	<ViewAdverbPage
 		word={word as AdverbDTO}
 		{relatedWords}
+		{relatedKanjis}
 	/>
 {:else if wordType === WordType.ADJECTIVE}
 	<ViewAdjectivePage
 		word={word as AdjectiveDTO}
 		{relatedWords}
+		{relatedKanjis}
 	/>
 {:else if wordType === WordType.PRE_NOUN_ADJECTIVAL}
 	<ViewPreNounAdjectivalPage
 		word={word as PreNounAdjectivalDTO}
 		{relatedWords}
+		{relatedKanjis}
 	/>
 {:else}
 	UNKNOWN WORD TYPE

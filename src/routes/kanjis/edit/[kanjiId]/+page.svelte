@@ -16,7 +16,7 @@
 	import NanoriReadingsFragment from "$lib/components/forms/kanji/NanoriReadingsFragment.svelte"
 	import MeaningsFragment from "$lib/components/forms/kanji/MeaningsFragment.svelte"
 	import RelatedWordsFragment from "$lib/components/forms/kanji/RelatedWordsFragment.svelte"
-	import RelatedKanjisFragment from "$lib/components/forms/kanji/RelatedKanjisFragment.svelte"
+	import RelatedKanjisFragment from "$lib/components/forms/RelatedKanjisFragment.svelte"
 	import type { PageProps } from "./$types"
 	import Modal from "flowbite-svelte/Modal.svelte"
 	import UpdateIcon from "flowbite-svelte-icons/FloppyDiskSolid.svelte"

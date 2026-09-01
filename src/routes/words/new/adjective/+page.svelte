@@ -11,6 +11,7 @@
 	import { AdjectiveDTO } from "$lib/dto.svelte"
 	import { AdjectiveSchema } from "$lib/schema"
 	import NewWordPage, { type Errors } from "../NewWordPage.svelte"
+	import RelatedKanjisFragment from "$lib/components/forms/RelatedKanjisFragment.svelte"
 
 	let word = $state(new AdjectiveDTO())
 </script>
@@ -64,6 +65,11 @@
 		<RelatedWordsFragment
 			bind:value={word.relatedWords}
 			wordId={word.id}
+			error={errors.relatedWords}
+		/>
+		<!-- Related kanjis -->
+		<RelatedKanjisFragment
+			bind:value={word.relatedWords}
 			error={errors.relatedWords}
 		/>
 	{/snippet}
