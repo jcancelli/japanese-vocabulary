@@ -9,7 +9,6 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
 ## TODO
 
 - Implement kanjis
-    - /edit route
     - /study routes
     - Add input for related kanjis to word pages
     - Display related kanjis in view word pages
