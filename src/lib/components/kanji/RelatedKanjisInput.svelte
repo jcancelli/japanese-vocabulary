@@ -16,13 +16,16 @@
 
 	let searchTerm = $state("")
 
-	const allKanjis = $derived(await getAllKanjis())
-	const fuse = $derived(
-		new Fuse(allKanjis ?? [], {
-			keys: ["kanji", "onyomi", "kunyomi", "nanori", "meanings.meaning"],
-		}),
+	const fusePromise = $derived(
+		getAllKanjis().then(
+			(kanjis) =>
+				new Fuse(kanjis, {
+					keys: ["kanji", "onyomi", "kunyomi", "nanori", "meanings.meaning"],
+				}),
+		),
 	)
-	const suggestions = $derived.by(() => {
+	const suggestionsPromise = $derived.by(async () => {
+		const fuse = await fusePromise
 		const excludeIds = new Set(value)
 		return (
 			fuse
@@ -34,7 +37,7 @@
 		)
 	})
 
-	const relatedKanjis = $derived(await getKanjis(value))
+	const relatedKanjisPromise = $derived(getKanjis(value))
 
 	function addRelatedKanji(entryId: UUIDv4) {
 		if (value.includes(entryId)) {
@@ -56,34 +59,38 @@
 			{disabled}
 		/>
 		{#if searchTerm !== ""}
-			<Listgroup
-				active
-				items={suggestions.map((suggestion) => {
-					const { id, kanji, meanings } = suggestion.item
-					return { name: `${kanji} (${meanings[0].meaning})`, kanjiid: id }
-				})}
-				onclick={(e) => {
-					if (disabled) {
-						return
-					}
-					const suggestedKanjiId = (
-						e!.currentTarget as HTMLButtonElement
-					).attributes.getNamedItem("kanjiid")?.nodeValue
-					addRelatedKanji(suggestedKanjiId as UUIDv4)
-				}}
-			/>
+			{#await suggestionsPromise then suggestions}
+				<Listgroup
+					active
+					items={suggestions.map((suggestion) => {
+						const { id, kanji, meanings } = suggestion.item
+						return { name: `${kanji} (${meanings[0].meaning})`, kanjiid: id }
+					})}
+					onclick={(e) => {
+						if (disabled) {
+							return
+						}
+						const suggestedKanjiId = (
+							e!.currentTarget as HTMLButtonElement
+						).attributes.getNamedItem("kanjiid")?.nodeValue
+						addRelatedKanji(suggestedKanjiId as UUIDv4)
+					}}
+				/>
+			{/await}
 		{/if}
 	</div>
 	<!-- Entries -->
 	<div class="grid grid-cols-[1fr_2.4rem] items-center p-4">
-		{#each relatedKanjis as relatedKanji, i (relatedKanji.id)}
-			<p class="text-sm">{relatedKanji.kanji} ({relatedKanji.meanings[0].meaning})</p>
-			<CloseButton
-				onclick={() => value.splice(i, 1)}
-				class="w-fit"
-			/>
-		{:else}
-			<p class="col-span-2 text-center">No entry</p>
-		{/each}
+		{#await relatedKanjisPromise then relatedKanjis}
+			{#each relatedKanjis as relatedKanji, i (relatedKanji.id)}
+				<p class="text-sm">{relatedKanji.kanji} ({relatedKanji.meanings[0].meaning})</p>
+				<CloseButton
+					onclick={() => value.splice(i, 1)}
+					class="w-fit"
+				/>
+			{:else}
+				<p class="col-span-2 text-center">No entry</p>
+			{/each}
+		{/await}
 	</div>
 </div>
