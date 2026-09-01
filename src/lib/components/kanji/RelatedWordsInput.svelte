@@ -16,25 +16,25 @@
 
 	let searchTerm = $state("")
 
-	const allWords = $derived(await getAllWords())
-	const fuse = $derived(
-		new Fuse(allWords ?? [], {
-			keys: ["kanji", "kana", "meanings.meaning"],
+	const fusePromise = $derived(
+		getAllWords().then(
+			(words) => new Fuse(words, { keys: ["kanji", "kana", "meanings.meaning"] }),
+		),
+	)
+	const suggestionsPromise = $derived(
+		fusePromise.then((fuse) => {
+			const excludeIds = new Set(value)
+			return (
+				fuse
+					.search(searchTerm)
+					// Exclude already related words
+					.filter((match) => !excludeIds.has(match.item.id))
+					// Max 5 suggestions
+					.slice(0, 5)
+			)
 		}),
 	)
-	const suggestions = $derived.by(() => {
-		const excludeIds = new Set(value)
-		return (
-			fuse
-				.search(searchTerm)
-				// Exclude already related words
-				.filter((match) => !excludeIds.has(match.item.id))
-				// Max 5 suggestions
-				.slice(0, 5)
-		)
-	})
-
-	const relatedWords = $derived(await getWords(value))
+	const relatedWordsPromise = $derived(getWords(value))
 
 	function addRelatedWord(entryId: UUIDv4) {
 		if (value.includes(entryId)) {
@@ -56,34 +56,38 @@
 			{disabled}
 		/>
 		{#if searchTerm !== ""}
-			<Listgroup
-				active
-				items={suggestions.map((suggestion) => {
-					const { id, kanji, kana, meanings } = suggestion.item
-					return { name: `${kanji ?? kana} (${meanings[0].meaning})`, wordid: id }
-				})}
-				onclick={(e) => {
-					if (disabled) {
-						return
-					}
-					const suggestedWordId = (
-						e!.currentTarget as HTMLButtonElement
-					).attributes.getNamedItem("wordid")?.nodeValue
-					addRelatedWord(suggestedWordId as UUIDv4)
-				}}
-			/>
+			{#await suggestionsPromise then suggestions}
+				<Listgroup
+					active
+					items={suggestions.map((suggestion) => {
+						const { id, kanji, kana, meanings } = suggestion.item
+						return { name: `${kanji ?? kana} (${meanings[0].meaning})`, wordid: id }
+					})}
+					onclick={(e) => {
+						if (disabled) {
+							return
+						}
+						const suggestedWordId = (
+							e!.currentTarget as HTMLButtonElement
+						).attributes.getNamedItem("wordid")?.nodeValue
+						addRelatedWord(suggestedWordId as UUIDv4)
+					}}
+				/>
+			{/await}
 		{/if}
 	</div>
 	<!-- Entries -->
 	<div class="grid grid-cols-[1fr_2.4rem] items-center p-4">
-		{#each relatedWords as relatedWord, i (relatedWord.id)}
-			<p class="text-sm">{relatedWord.primaryWriting} ({relatedWord.primaryMeaning})</p>
-			<CloseButton
-				onclick={() => value.splice(i, 1)}
-				class="w-fit"
-			/>
-		{:else}
-			<p class="col-span-2 text-center">No entry</p>
-		{/each}
+		{#await relatedWordsPromise then relatedWords}
+			{#each relatedWords as relatedWord, i (relatedWord.id)}
+				<p class="text-sm">{relatedWord.primaryWriting} ({relatedWord.primaryMeaning})</p>
+				<CloseButton
+					onclick={() => value.splice(i, 1)}
+					class="w-fit"
+				/>
+			{:else}
+				<p class="col-span-2 text-center">No entry</p>
+			{/each}
+		{/await}
 	</div>
 </div>
