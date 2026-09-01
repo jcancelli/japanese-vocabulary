@@ -18,5 +18,6 @@
 		<ListgroupItem href={resolve("/words/new/pre-noun-adjectival")}>
 			Pre-Noun Adjectival
 		</ListgroupItem>
+		<ListgroupItem href={resolve("/kanjis/new")}>Kanji</ListgroupItem>
 	</Listgroup>
 </SpeedDial>
