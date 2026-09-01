@@ -16,7 +16,6 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
 - Implement kanji drawing
 - Consider "rarity" field, to sort words by most common to uncommon (better study the most common first)
 - Move db operations into transactions
-- Add navigation to new/edit/view word/kanji pages and remove "Cancel" buttons
 - Add dark mode styling
 - Improve local storage interface (versioning and stuff)
 - Add error pages

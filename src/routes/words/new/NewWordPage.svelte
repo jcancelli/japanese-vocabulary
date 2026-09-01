@@ -5,7 +5,6 @@
 	import { WORD_TYPE_PRETTY_STRING } from "$lib/strings"
 	import Button from "flowbite-svelte/Button.svelte"
 	import CreateIcon from "flowbite-svelte-icons/PlusOutline.svelte"
-	import CancelIcon from "flowbite-svelte-icons/CloseOutline.svelte"
 	import type { Snippet } from "svelte"
 	import WordPage from "../WordPage.svelte"
 	import type { WordDTO } from "$lib/dto.svelte"
@@ -83,12 +82,6 @@
 			onclick={oncreate}
 		>
 			<CreateIcon /> Create
-		</Button>
-		<Button
-			color="gray"
-			href={resolve("/words")}
-		>
-			<CancelIcon /> Cancel
 		</Button>
 	{/snippet}
 </WordPage>

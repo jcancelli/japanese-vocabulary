@@ -103,12 +103,6 @@
 		>
 			<DeleteIcon /> Delete
 		</Button>
-		<Button
-			color="gray"
-			href={resolve("/words/view/[wordId]", { wordId: word.id })}
-		>
-			<CancelIcon /> Cancel
-		</Button>
 	{/snippet}
 </WordPage>
 
