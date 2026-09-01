@@ -2,7 +2,7 @@
 	import {
 		getWordStudySessionContext,
 		StudySessionLanguage,
-		WordStudySessionStep,
+		StudySessionStep,
 	} from "$lib/study_session"
 	import AnswerPage from "./AnswerPage.svelte"
 	import QuestionPage from "./QuestionPage.svelte"
@@ -13,7 +13,7 @@
 
 	const session = getWordStudySessionContext()
 
-	if (session.step !== WordStudySessionStep.STUDY) {
+	if (session.step !== StudySessionStep.STUDY) {
 		await goto(resolve("/words/study/configure"))
 	}
 
@@ -24,10 +24,10 @@
 		}
 		switch (navigation.to.route.id) {
 			case "/words/study/configure":
-				session.step = WordStudySessionStep.CONFIGURE
+				session.step = StudySessionStep.CONFIGURE
 				break
-			case "/words/study/no-more-words":
-				session.step = WordStudySessionStep.FINISHED
+			case "/words/study/finish":
+				session.step = StudySessionStep.FINISHED
 				break
 		}
 	})
@@ -60,7 +60,7 @@
 	function onNextWord() {
 		if (session.words.length === 1) {
 			session.words.splice(0, 1)
-			goto(resolve("/words/study/no-more-words"))
+			goto(resolve("/words/study/finish"))
 			return
 		}
 		answer = ""

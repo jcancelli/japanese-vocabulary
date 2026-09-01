@@ -14,7 +14,7 @@
 		getWordStudySessionContext,
 		StudySessionLanguage,
 		WordStudySessionSortingField,
-		WordStudySessionStep,
+		StudySessionStep,
 	} from "$lib/study_session"
 	import { resolve } from "$app/paths"
 	import { beforeNavigate, goto } from "$app/navigation"
@@ -39,10 +39,10 @@
 		}
 		switch (navigation.to.route.id) {
 			case "/words/study/session":
-				session.step = WordStudySessionStep.STUDY
+				session.step = StudySessionStep.STUDY
 				break
-			case "/words/study/no-more-words":
-				session.step = WordStudySessionStep.FINISHED
+			case "/words/study/finish":
+				session.step = StudySessionStep.FINISHED
 				break
 		}
 	})
@@ -58,7 +58,7 @@
 
 		session.words = await getStudySessionWords(session.params)
 		if (session.words.length === 0) {
-			await goto(resolve("/words/study/no-more-words"))
+			await goto(resolve("/words/study/finish"))
 			return
 		}
 		await goto(resolve("/words/study/session"))
@@ -189,7 +189,7 @@
 		</Button>
 	</div>
 </main>
-
+<!-- Errors feed -->
 <ErrorsFeed
 	bind:this={errorFeed}
 	autoDismissTimeoutMs={5000}

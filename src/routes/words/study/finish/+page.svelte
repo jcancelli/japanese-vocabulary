@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { beforeNavigate, goto } from "$app/navigation"
 	import { resolve } from "$app/paths"
-	import { getWordStudySessionContext, WordStudySessionStep } from "$lib/study_session"
+	import { getWordStudySessionContext, StudySessionStep } from "$lib/study_session"
 	import { Button } from "flowbite-svelte"
 
 	const session = getWordStudySessionContext()
 
-	if (session.step !== WordStudySessionStep.FINISHED) {
+	if (session.step !== StudySessionStep.FINISHED) {
 		await goto(resolve("/words/study/configure"))
 	}
 
@@ -17,7 +17,7 @@
 		}
 		switch (navigation.to.route.id) {
 			case "/words/study/configure":
-				session.step = WordStudySessionStep.CONFIGURE
+				session.step = StudySessionStep.CONFIGURE
 				break
 		}
 	})
