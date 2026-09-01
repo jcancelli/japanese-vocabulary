@@ -107,7 +107,7 @@ export async function updateWordRelationshipsForKanji(kanji: Kanji): Promise<voi
 
 export async function updateKanjiRelationshipsForKanji(kanji: Kanji): Promise<void> {
 	const oldRelatedKanjisIds = new Set(await getRelatedKanjiIdsForKanji(kanji.id))
-	const newRelatedKanjisIds = new Set(kanji.relatedWords)
+	const newRelatedKanjisIds = new Set(kanji.relatedKanjis)
 	const relationshipsToCreateIds = Array.from(newRelatedKanjisIds.difference(oldRelatedKanjisIds))
 	const relationshipsToDeleteIds = Array.from(oldRelatedKanjisIds.difference(newRelatedKanjisIds))
 	// Delete remove relationships
