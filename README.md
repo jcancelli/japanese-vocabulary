@@ -9,7 +9,7 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
 ## TODO
 
 - Implement kanjis
-    - /study routes
+    - /study/session route
 - Implement counters
 - Implement kanji drawing
 - Consider "rarity" field, to sort words by most common to uncommon (better study the most common first)
