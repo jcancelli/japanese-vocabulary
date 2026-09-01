@@ -1,5 +1,5 @@
 <script lang="ts">
-	import WordsIcon from "flowbite-svelte-icons/ListOutline.svelte"
+	import ListIcon from "flowbite-svelte-icons/ListOutline.svelte"
 	import StudyIcon from "flowbite-svelte-icons/BrainOutline.svelte"
 	import SettingsIcon from "flowbite-svelte-icons/AdjustmentsHorizontalSolid.svelte"
 	import SandboxIcon from "flowbite-svelte-icons/MicroscopeSolid.svelte"
@@ -25,9 +25,11 @@
 <main
 	class="grid max-h-screen w-screen grid-cols-2 items-start justify-items-center gap-y-7 overflow-hidden p-5"
 >
-	{@render Card(resolve("/words"), "Words", WordsIcon)}
+	{@render Card(resolve("/words"), "Words", ListIcon)}
 	{@render Card(resolve("/words/study/configure"), "Study words", StudyIcon)}
+	{@render Card(resolve("/kanjis"), "Kanjis", ListIcon)}
 	{#if import.meta.env.DEV}
+		{@render Card(resolve("/kanjis/study/configure"), "Study kanjis", StudyIcon)}
 		{@render Card(resolve("/settings"), "Settings", SettingsIcon)}
 		{@render Card(resolve("/sandbox"), "Sandbox", SandboxIcon)}
 	{/if}
