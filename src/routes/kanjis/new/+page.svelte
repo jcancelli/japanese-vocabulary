@@ -8,7 +8,6 @@
 	import KanjiPage from "../KanjiPage.svelte"
 	import Button from "flowbite-svelte/Button.svelte"
 	import CreateIcon from "flowbite-svelte-icons/PlusOutline.svelte"
-	import CancelIcon from "flowbite-svelte-icons/CloseOutline.svelte"
 	import ErrorsFeed from "$lib/components/ErrorsFeed.svelte"
 	import TagsFragment from "$lib/components/forms/TagsFragment.svelte"
 	import DifficultyFragment from "$lib/components/forms/DifficultyFragment.svelte"
@@ -130,12 +129,6 @@
 			onclick={oncreate}
 		>
 			<CreateIcon /> Create
-		</Button>
-		<Button
-			color="gray"
-			href={resolve("/kanjis")}
-		>
-			<CancelIcon /> Cancel
 		</Button>
 	{/snippet}
 </KanjiPage>
