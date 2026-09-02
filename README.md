@@ -19,7 +19,7 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
     - single list page for all item types (+ advanced search)
 - grammar rules
 - "rarity" field, to sort words by most common to uncommon (better study the most common first)
-- leaving some fields optional (like jlpt level)
+- leaving some fields optional (like jlpt level, verb transitivity and type, adjective type)
 - db operations inside transactions
 - dark mode
 - error pages (also differentiate between 404 and 500 for pages that load data)
