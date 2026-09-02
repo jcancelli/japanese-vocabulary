@@ -8,15 +8,22 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
 
 ## TODO
 
-- Implement kanjis
+- nuke db and local storage
+- rework difficulty input
+- kanjis
     - /study/session route
-- Implement counters
-- Implement kanji drawing
-- Consider "rarity" field, to sort words by most common to uncommon (better study the most common first)
-- Move db operations into transactions
-- Add dark mode styling
-- Add error pages
-- Add alternative answers to the correct page
-- Add export/import database to settings
-- Maybe rework difficulty input
-- Probe text-to-speech for japanese pronounciation
+- more info in the correct study page (alternative answers, maybe more)
+- kanji drawing
+- counters
+- nouns, pre-noun adjectivals and adverbs as a single struct
+- unify items
+    - single study session page for all item types
+    - single list page for all item types (+ advanced search)
+- grammar rules
+- "rarity" field, to sort words by most common to uncommon (better study the most common first)
+- leaving some fields optional (like jlpt level)
+- db operations inside transactions
+- dark mode
+- error pages (also differentiate between 404 and 500 for pages that load data)
+- export/import database
+- text-to-speech for japanese pronounciation
