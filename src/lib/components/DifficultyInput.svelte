@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Difficulty } from "$lib/model"
-	import { DIFFICULTY_PRETTY_STRING } from "$lib/strings"
-	import Range from "flowbite-svelte/Range.svelte"
+	import StarOutlineIcon from "flowbite-svelte-icons/StarOutline.svelte"
+	import StarSolidIcon from "flowbite-svelte-icons/StarSolid.svelte"
 
 	export interface DifficultyInputProps {
 		value: Difficulty
@@ -12,12 +12,30 @@
 	let { value = $bindable(), disabled, ...props }: DifficultyInputProps = $props()
 </script>
 
-<Range
-	min={1}
-	max={5}
-	step={1}
-	bind:value={() => value * -1 + 6, (v) => (value = v * -1 + 6)}
-	{disabled}
-	{...props}
-/>
-<p>{DIFFICULTY_PRETTY_STRING[value]}</p>
+{#snippet StarButton(difficulty: Difficulty)}
+	{@const isFilled = value <= difficulty}
+	<button
+		onclick={() => (value = difficulty)}
+		{disabled}
+		class="
+			text-primary-600
+			not-disabled:hover:scale-110
+			not-disabled:hover:cursor-pointer
+			not-disabled:active:scale-110
+		"
+	>
+		{#if isFilled}
+			<StarSolidIcon class="size-9" />
+		{:else}
+			<StarOutlineIcon class="size-9" />
+		{/if}
+	</button>
+{/snippet}
+
+<div class="flex w-fit flex-row flex-nowrap items-center justify-center {props.class ?? ''}">
+	{@render StarButton(Difficulty.DONT_KNOW)}
+	{@render StarButton(Difficulty.KINDA_DONT_KNOW)}
+	{@render StarButton(Difficulty.KINDA_KNOW)}
+	{@render StarButton(Difficulty.KNOW)}
+	{@render StarButton(Difficulty.UNFORGETTABLE)}
+</div>

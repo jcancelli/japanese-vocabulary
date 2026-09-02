@@ -21,6 +21,7 @@
 	<DifficultyInput
 		bind:value
 		{disabled}
+		class="mx-auto"
 	/>
 	{#if error}
 		<Helper

@@ -8,7 +8,6 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
 
 ## TODO
 
-- rework difficulty input
 - kanjis
     - /study/session route
 - more info in the correct study page (alternative answers, maybe more)
