@@ -3,44 +3,46 @@ import type {
 	WordType,
 	JLPTLevel,
 	Difficulty,
-	ExampleSentence,
 	VerbType,
 	VerbTransitivity,
 	AdjectiveType,
-	WordMeaning,
-	KanjiMeaning,
+	VocabularyItemType,
+	SimpleWordType,
 } from "$lib/model"
 import Dexie, { type EntityTable } from "dexie"
+
+export interface VocabularyItemData {
+	id: UUIDv4
+	itemType: VocabularyItemType
+	meanings: MeaningData[]
+	jlptLevel?: JLPTLevel | undefined
+	difficulty: Difficulty
+	lastStudiedAt?: Date | undefined
+	tags: string[]
+}
 
 export interface WordData {
 	id: UUIDv4
 	wordType: WordType
-	jlptLevel: JLPTLevel
-	difficulty: Difficulty
 	kanji?: string
 	kana: string
-	meanings: WordMeaningData[]
-	examples: ExampleSentence[]
-	tags: string[]
-	lastStudiedAt: Date
+	examples: ExampleSentenceData[]
+}
+
+export interface SimpleWordData {
+	id: UUIDv4
+	wordSubtypes: SimpleWordType[]
 }
 
 export interface VerbData {
 	id: UUIDv4
-	verbType: VerbType
-	transitivity: VerbTransitivity
+	verbType?: VerbType | undefined
+	transitivity?: VerbTransitivity | undefined
 }
 
 export interface AdjectiveData {
 	id: UUIDv4
-	adjectiveType: AdjectiveType
-}
-
-export type WordMeaningData = WordMeaning
-
-export interface WordRelationship {
-	wordId: UUIDv4
-	relatedId: UUIDv4
+	adjectiveType?: AdjectiveType | undefined
 }
 
 export interface KanjiData {
@@ -49,43 +51,65 @@ export interface KanjiData {
 	onyomi: string[]
 	kunyomi: string[]
 	nanori: string[]
-	meanings: KanjiMeaningData[]
-	jlptLevel: JLPTLevel
-	difficulty: Difficulty
-	lastStudiedAt: Date
-	tags: string[]
 }
 
-export interface KanjiRelationship {
-	kanjiId: UUIDv4
+export interface CounterData {
+	id: UUIDv4
+	counter: string
+	variants: CounterVariantsData
+	examples: ExampleSentenceData[]
+}
+
+export interface MeaningData {
+	meaning: string
+	note?: string | undefined
+}
+
+export interface ExampleSentenceData {
+	english: string
+	japanese: string
+}
+
+export interface CounterVariantsData {
+	1?: string | undefined
+	2?: string | undefined
+	3?: string | undefined
+	4?: string | undefined
+	5?: string | undefined
+	6?: string | undefined
+	7?: string | undefined
+	8?: string | undefined
+	9?: string | undefined
+	10?: string | undefined
+	11?: string | undefined
+}
+
+export interface ItemRelationshipData {
+	itemId: UUIDv4
 	relatedId: UUIDv4
+	relatedType: VocabularyItemType
 }
-
-export interface WordKanjiRelationship {
-	wordId: UUIDv4
-	kanjiId: UUIDv4
-}
-
-export type KanjiMeaningData = KanjiMeaning
 
 export type Database = Dexie & {
+	items: EntityTable<VocabularyItemData, "id">
 	words: EntityTable<WordData, "id">
+	simpleWords: EntityTable<SimpleWordData, "id">
 	verbs: EntityTable<VerbData, "id">
 	adjectives: EntityTable<AdjectiveData, "id">
 	kanjis: EntityTable<KanjiData, "id">
-	relatedWords: EntityTable<WordRelationship>
-	relatedKanjis: EntityTable<KanjiRelationship>
-	relatedWordsKanjis: EntityTable<WordKanjiRelationship>
+	counters: EntityTable<CounterData, "id">
+	itemRelationships: EntityTable<ItemRelationshipData>
 }
 
 export const db = new Dexie("JapaneseFlashcards") as Database
 
 db.version(1).stores({
-	words: "id, wordType, jlptLevel, difficulty, kanji, kana, meanings, examples, *tags, lastStudiedAt",
+	items: "id, itemType, *meanings, jlptLevel, difficulty, lastStudiedAt, *tags",
+	words: "id, wordType, kanji, kana",
+	simpleWords: "id, *wordSubtypes",
 	verbs: "id, verbType, transitivity",
 	adjectives: "id, adjectiveType",
-	kanjis: "id, kanji, *onyomi, *kunyomi, *nanori, meanings, jlptLevel, difficulty, lastStudiedAt, *tags",
-	relatedWords: "++, wordId, relatedId",
-	relatedKanjis: "++, kanjiId, relatedId",
-	relatedWordsKanjis: "++, wordId, kanjiId",
+	kanjis: "id, kanji, *onyomi, *kunyomi, *nanori",
+	counters: "id, counter, variants",
+	itemRelationships: "++, itemId, relatedId, relatedType",
 })
