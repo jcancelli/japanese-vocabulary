@@ -1,5 +1,5 @@
 import z from "zod"
-import { AdjectiveType, JLPTLevel, VerbType, Difficulty, WordType, type UUIDv4 } from "./model"
+import { AdjectiveType, JLPTLevel, SimpleWordType, VerbType, WordType, type UUIDv4 } from "./model"
 import { hiraganaStringRegex, kanaStringRegex, kanjiKanaStringRegex } from "./japanese/regex"
 import { capitalizeString } from "./strings"
 
@@ -7,8 +7,9 @@ export const UUIDv4Schema = z.custom<UUIDv4>((value) => {
 	return z.uuidv4().safeParse(value).success
 }, "Invalid UUIDv4")
 export const WordTypeSchema = z.enum(WordType, "Invalid word type")
+export const SimpleWordTypeSchema = z.enum(SimpleWordType, "Invalid simple word type")
 export const JLPTLevelSchema = z.enum(JLPTLevel, "Invalid JLPT level")
-export const DifficultySchema = z.enum(Difficulty, "Invalid difficulty")
+export const DifficultySchema = z.int().min(1, "Invalid difficulty").max(5, "Invalid difficulty")
 export const KanjiStringSchema = z
 	.string()
 	.trim()
@@ -24,28 +25,18 @@ export const VerbTransitivitySchema = z.object({
 	intransitive: z.boolean(),
 })
 export const AdjectiveTypeSchema = z.enum(AdjectiveType, "Invalid adjective type")
-export const WordMeaningSchema = z.object(
+export const MeaningSchema = z.object(
 	{
 		meaning: z.string().trim().nonempty().transform(capitalizeString),
 		note: z
 			.string()
 			.trim()
-			.transform((v) => (v === "" ? undefined : capitalizeString(v)))
+			.transform((v) => (v === "" ? undefined : v.toLowerCase()))
 			.optional(),
 	},
-	"Invalid word meaning",
+	"Invalid meaning",
 )
-export const KanjiMeaningSchema = z.object(
-	{
-		meaning: z.string().trim().nonempty().transform(capitalizeString),
-		note: z
-			.string()
-			.trim()
-			.transform((v) => (v === "" ? undefined : capitalizeString(v)))
-			.optional(),
-	},
-	"Invalid kanji meaning",
-)
+export const MeaningsSchema = z.array(MeaningSchema).nonempty("At least one meaning is needed")
 export const ExampleSentenceSchema = z.object(
 	{
 		japanese: z.string().trim().nonempty().transform(capitalizeString),
@@ -53,38 +44,49 @@ export const ExampleSentenceSchema = z.object(
 	},
 	"Invalid example sentence",
 )
+export const CounterVariantsSchema = z.object({
+	1: KanaStringSchema.optional(),
+	2: KanaStringSchema.optional(),
+	3: KanaStringSchema.optional(),
+	4: KanaStringSchema.optional(),
+	5: KanaStringSchema.optional(),
+	6: KanaStringSchema.optional(),
+	7: KanaStringSchema.optional(),
+	8: KanaStringSchema.optional(),
+	9: KanaStringSchema.optional(),
+	10: KanaStringSchema.optional(),
+	11: KanaStringSchema.optional(),
+})
 export const TagSchema = z.string().regex(/^[a-z\-]+$/g, "Invalid character")
+export const TagsSchema = z.array(TagSchema).refine(isSetLikeArray, "Duplicate tag")
+export const UUIDv4SetSchema = z.array(UUIDv4Schema).refine(isSetLikeArray, "Duplicate id")
 export const WordSchema = z.object({
 	id: UUIDv4Schema,
 	wordType: WordTypeSchema,
-	jlptLevel: JLPTLevelSchema,
+	jlptLevel: JLPTLevelSchema.optional(),
 	difficulty: DifficultySchema,
 	kanji: KanjiStringSchema.nonempty("Empty field").optional(),
 	kana: KanaStringSchema.nonempty("Empty field"),
-	meanings: z.array(WordMeaningSchema).min(1, "At least one meaning is needed"),
+	meanings: MeaningsSchema,
 	examples: z.array(ExampleSentenceSchema),
-	tags: z.array(TagSchema).refine(isSetLikeArray, "Duplicate tag"),
-	relatedWords: z.array(UUIDv4Schema).refine(isSetLikeArray, "Duplicate related word"),
-	relatedKanjis: z.array(UUIDv4Schema).refine(isSetLikeArray, "Duplicate related kanjis"),
-	lastStudiedAt: z.date(),
+	tags: TagsSchema,
+	relatedWords: UUIDv4SetSchema,
+	relatedKanjis: UUIDv4SetSchema,
+	relatedCounters: UUIDv4SetSchema,
+	lastStudiedAt: z.date().optional(),
 })
-export const NounSchema = WordSchema.extend({
-	wordType: z.literal(WordType.NOUN),
+export const SimpleWordSchema = WordSchema.extend({
+	wordType: z.literal(WordType.SIMPLE),
+	wordSybtypes: z.array(SimpleWordTypeSchema).nonempty().refine(isSetLikeArray),
 })
 export const VerbSchema = WordSchema.extend({
 	wordType: z.literal(WordType.VERB),
-	verbType: VerbTypeSchema,
-	transitivity: VerbTransitivitySchema,
-})
-export const AdverbSchema = WordSchema.extend({
-	wordType: z.literal(WordType.ADVERB),
+	verbType: VerbTypeSchema.optional(),
+	transitivity: VerbTransitivitySchema.optional(),
 })
 export const AdjectiveSchema = WordSchema.extend({
 	wordType: z.literal(WordType.ADJECTIVE),
-	adjectiveType: AdjectiveTypeSchema,
-})
-export const PreNounAdjectivalSchema = WordSchema.extend({
-	wordType: z.literal(WordType.PRE_NOUN_ADJECTIVAL),
+	adjectiveType: AdjectiveTypeSchema.optional(),
 })
 export const KanjiSchema = z.object({
 	id: UUIDv4Schema,
@@ -92,13 +94,27 @@ export const KanjiSchema = z.object({
 	onyomi: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate on'yomi"),
 	kunyomi: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate kun'yomi"),
 	nanori: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate naori"),
-	meanings: z.array(KanjiMeaningSchema).min(1, "At least one meaning is needed"),
-	jlptLevel: JLPTLevelSchema,
+	meanings: MeaningsSchema,
+	jlptLevel: JLPTLevelSchema.optional(),
 	difficulty: DifficultySchema,
-	lastStudiedAt: z.date(),
-	tags: z.array(TagSchema).refine(isSetLikeArray, "Duplicate tag"),
-	relatedWords: z.array(UUIDv4Schema).refine(isSetLikeArray, "Duplicate related word"),
-	relatedKanjis: z.array(UUIDv4Schema).refine(isSetLikeArray, "Duplicate related kanji"),
+	lastStudiedAt: z.date().optional(),
+	tags: TagsSchema,
+	relatedWords: UUIDv4SetSchema,
+	relatedKanjis: UUIDv4SetSchema,
+	relatedCounters: UUIDv4SetSchema,
+})
+export const CounterSchema = z.object({
+	id: UUIDv4Schema,
+	writing: KanaStringSchema.nonempty("Empty field"),
+	pronounciations: CounterVariantsSchema,
+	meanings: MeaningsSchema,
+	jlptLevel: JLPTLevelSchema.optional(),
+	difficulty: DifficultySchema,
+	lastStudiedAt: z.date().optional(),
+	tags: TagsSchema,
+	relatedWords: UUIDv4SetSchema,
+	relatedKanjis: UUIDv4SetSchema,
+	relatedCounters: UUIDv4SetSchema,
 })
 
 export function isSetLikeArray<T>(array: T[]): boolean {
