@@ -1,129 +1,119 @@
 import type { KanjiDTO, WordDTO } from "$lib/dto.svelte"
-import type { Kanji, UUIDv4, Word } from "$lib/model"
+import { VocabularyItemType, type UUIDv4, type VocabularyItem } from "$lib/model"
 import { db } from "./database"
 import { getKanjis } from "./kanjis"
 import { getWords } from "./words"
 
-export async function getRelatedWordIdsForWord(id: UUIDv4): Promise<UUIDv4[]> {
-	return await db.relatedWords
-		.where("wordId")
-		.equals(id)
+export async function getRelatedWordsIdsForVocabularyItem(itemId: UUIDv4): Promise<UUIDv4[]> {
+	return await db.itemRelationships
+		.where("itemId")
+		.equals(itemId)
+		.and(({ relatedType }) => relatedType === VocabularyItemType.WORD)
 		.toArray()
-		.then((relationships) => relationships.map(({ relatedId }) => relatedId))
+		.then((results) => results.map(({ relatedId }) => relatedId))
 }
 
-export async function getRelatedKanjiIdsForWord(id: UUIDv4): Promise<UUIDv4[]> {
-	return await db.relatedWordsKanjis
-		.where("wordId")
-		.equals(id)
+export async function getRelatedKanjisIdsForVocabularyItem(itemId: UUIDv4): Promise<UUIDv4[]> {
+	return await db.itemRelationships
+		.where("itemId")
+		.equals(itemId)
+		.and(({ relatedType }) => relatedType === VocabularyItemType.KANJI)
 		.toArray()
-		.then((relationships) => relationships.map(({ kanjiId }) => kanjiId))
+		.then((results) => results.map(({ relatedId }) => relatedId))
 }
 
-export async function getRelatedWordIdsForKanji(id: UUIDv4): Promise<UUIDv4[]> {
-	return await db.relatedWordsKanjis
-		.where("kanjiId")
-		.equals(id)
+export async function getRelatedCountersIdsForVocabularyItem(itemId: UUIDv4): Promise<UUIDv4[]> {
+	return await db.itemRelationships
+		.where("itemId")
+		.equals(itemId)
+		.and(({ relatedType }) => relatedType === VocabularyItemType.COUNTER)
 		.toArray()
-		.then((relationships) => relationships.map(({ wordId }) => wordId))
+		.then((results) => results.map(({ relatedId }) => relatedId))
 }
 
-export async function getRelatedKanjiIdsForKanji(id: UUIDv4): Promise<UUIDv4[]> {
-	return await db.relatedKanjis
-		.where("kanjiId")
-		.equals(id)
+export async function getRelatedVocabularyItemsIdsForVocabularyItem(
+	itemId: UUIDv4,
+): Promise<UUIDv4[]> {
+	return await db.itemRelationships
+		.where("itemId")
+		.equals(itemId)
 		.toArray()
-		.then((relationships) => relationships.map(({ relatedId }) => relatedId))
+		.then((results) => results.map(({ relatedId }) => relatedId))
 }
 
-export async function getRelatedWordsForWord(wordId: UUIDv4): Promise<WordDTO[]> {
-	const wordIds = await getRelatedWordIdsForWord(wordId)
-	return await getWords(wordIds)
+export async function getRelatedWordsForVocabularyItem(itemId: UUIDv4): Promise<WordDTO[]> {
+	const wordsIds = await getRelatedWordsIdsForVocabularyItem(itemId)
+	return await getWords(wordsIds)
 }
 
-export async function getRelatedKanjisForWord(id: UUIDv4): Promise<KanjiDTO[]> {
-	const kanjiIds = await getRelatedKanjiIdsForWord(id)
-	return await getKanjis(kanjiIds)
+export async function getRelatedKanjisForVocabularyItem(itemId: UUIDv4): Promise<KanjiDTO[]> {
+	const kanjisIds = await getRelatedKanjisIdsForVocabularyItem(itemId)
+	return await getKanjis(kanjisIds)
 }
 
-export async function getRelatedWordsForKanji(kanjiId: UUIDv4): Promise<WordDTO[]> {
-	const wordIds = await getRelatedWordIdsForKanji(kanjiId)
-	return await getWords(wordIds)
+export async function getRelatedCountersForVocabularyItem(itemId: UUIDv4): Promise<WordDTO[]> {
+	const countersIds = await getRelatedCountersIdsForVocabularyItem(itemId)
+	return await getCounters(countersIds)
 }
 
-export async function getRelatedKanjisForKanji(id: UUIDv4): Promise<KanjiDTO[]> {
-	const kanjiIds = await getRelatedKanjiIdsForKanji(id)
-	return await getKanjis(kanjiIds)
+export async function getRelatedVocabularyItemsForVocabularyItem(
+	itemId: UUIDv4,
+): Promise<WordDTO[]> {
+	const itemsIds = await getRelatedVocabularyItemsIdsForVocabularyItem(itemId)
+	return await getVocabularyItems(itemsIds)
 }
 
-export async function updateWordRelationshipsForWord(word: Word): Promise<void> {
-	const oldRelatedWordsIds = new Set(await getRelatedWordIdsForWord(word.id))
-	const newRelatedWordsIds = new Set(word.relatedWords)
-	const relationshipsToCreateIds = Array.from(newRelatedWordsIds.difference(oldRelatedWordsIds))
-	const relationshipsToDeleteIds = Array.from(oldRelatedWordsIds.difference(newRelatedWordsIds))
-	// Delete remove relationships
-	await db.relatedWords
-		.where("wordId")
-		.anyOf(relationshipsToDeleteIds)
-		.or("relatedId")
-		.anyOf(relationshipsToDeleteIds)
-		.delete()
-	// Create new relationships
-	await db.relatedWords.bulkAdd(
-		relationshipsToCreateIds.flatMap((id) => {
-			return [
-				{ wordId: word.id, relatedId: id },
-				{ wordId: id, relatedId: word.id },
-			]
-		}),
-	)
+export async function updateVocabularyItemRelationships(item: VocabularyItem): Promise<void> {
+	await db.transaction("rw", ["itemRelationships"], async () => {
+		// Related words
+		await updateVocabularyItemRelationshipsByRelatedType(
+			item.id,
+			VocabularyItemType.WORD,
+			await getRelatedWordsIdsForVocabularyItem(item.id),
+			item.relatedWords,
+		)
+		// Related kanjis
+		await updateVocabularyItemRelationshipsByRelatedType(
+			item.id,
+			VocabularyItemType.KANJI,
+			await getRelatedKanjisIdsForVocabularyItem(item.id),
+			item.relatedKanjis,
+		)
+		// Related counters
+		await updateVocabularyItemRelationshipsByRelatedType(
+			item.id,
+			VocabularyItemType.COUNTER,
+			await getRelatedCountersIdsForVocabularyItem(item.id),
+			item.relatedCounters,
+		)
+	})
 }
 
-export async function updateKanjiRelationshipsForWord(word: Word): Promise<void> {
-	const oldRelatedKanjisIds = new Set(await getRelatedKanjiIdsForWord(word.id))
-	const newRelatedKanjisIds = new Set(word.relatedKanjis)
-	const relationshipsToCreateIds = Array.from(newRelatedKanjisIds.difference(oldRelatedKanjisIds))
-	const relationshipsToDeleteIds = Array.from(oldRelatedKanjisIds.difference(newRelatedKanjisIds))
-	// Delete removed relationships
-	await db.relatedWordsKanjis.where("wordId").anyOf(relationshipsToDeleteIds).delete()
-	// Create added relationships
-	await db.relatedWordsKanjis.bulkAdd(
-		relationshipsToCreateIds.map((kanjiId) => ({ wordId: word.id, kanjiId })),
-	)
-}
-
-export async function updateWordRelationshipsForKanji(kanji: Kanji): Promise<void> {
-	const oldRelatedWordsIds = new Set(await getRelatedWordIdsForKanji(kanji.id))
-	const newRelatedWordsIds = new Set(kanji.relatedWords)
-	const relationshipsToCreateIds = Array.from(newRelatedWordsIds.difference(oldRelatedWordsIds))
-	const relationshipsToDeleteIds = Array.from(oldRelatedWordsIds.difference(newRelatedWordsIds))
-	// Delete remove relationships
-	await db.relatedWordsKanjis.where("wordId").anyOf(relationshipsToDeleteIds).delete()
-	// Create new relationships
-	await db.relatedWordsKanjis.bulkAdd(
-		relationshipsToCreateIds.map((wordId) => ({ wordId, kanjiId: kanji.id })),
-	)
-}
-
-export async function updateKanjiRelationshipsForKanji(kanji: Kanji): Promise<void> {
-	const oldRelatedKanjisIds = new Set(await getRelatedKanjiIdsForKanji(kanji.id))
-	const newRelatedKanjisIds = new Set(kanji.relatedKanjis)
-	const relationshipsToCreateIds = Array.from(newRelatedKanjisIds.difference(oldRelatedKanjisIds))
-	const relationshipsToDeleteIds = Array.from(oldRelatedKanjisIds.difference(newRelatedKanjisIds))
-	// Delete remove relationships
-	await db.relatedKanjis
-		.where("kanjiId")
-		.anyOf(relationshipsToDeleteIds)
-		.or("relatedId")
-		.anyOf(relationshipsToDeleteIds)
-		.delete()
-	// Create new relationships
-	await db.relatedKanjis.bulkAdd(
-		relationshipsToCreateIds.flatMap((id) => {
-			return [
-				{ kanjiId: kanji.id, relatedId: id },
-				{ kanjiId: id, relatedId: kanji.id },
-			]
-		}),
-	)
+async function updateVocabularyItemRelationshipsByRelatedType(
+	itemId: UUIDv4,
+	relatedType: VocabularyItemType,
+	oldRelatedIds: UUIDv4[],
+	newRelatedIds: UUIDv4[],
+): Promise<void> {
+	const oldIds = new Set(oldRelatedIds)
+	const newIds = new Set(newRelatedIds)
+	const toDelete = oldIds.difference(newIds)
+	const toCreate = Array.from(newIds.difference(oldIds))
+	await db.transaction("rw", ["itemRelationships"], async (tx) => {
+		// Delete removed relationships
+		await tx.itemRelationships
+			.where("itemId")
+			.equals(itemId)
+			.and(({ relatedId }) => toDelete.has(relatedId))
+			.delete()
+		// Create new relationships
+		await tx.itemRelationships.bulkAdd(
+			toCreate.flatMap((id) => {
+				return [
+					{ itemId: itemId, relatedId: id, relatedType },
+					{ itemId: id, relatedId: itemId, relatedType },
+				]
+			}),
+		)
+	})
 }
