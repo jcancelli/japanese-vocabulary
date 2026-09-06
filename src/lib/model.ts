@@ -49,7 +49,7 @@ export interface Kanji {
 export interface Counter {
 	id: UUIDv4
 	writing: string
-	pronounciations: CounterVariants
+	variants: CounterVariants
 	meanings: Meaning[]
 	jlptLevel?: JLPTLevel
 	difficulty: Difficulty
