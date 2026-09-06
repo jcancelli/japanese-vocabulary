@@ -1,17 +1,17 @@
 export interface Word {
 	id: UUIDv4
 	wordType: WordType
-	jlptLevel?: JLPTLevel
-	difficulty: Difficulty
 	kanji?: string
 	kana: string
 	meanings: Meaning[]
+	jlptLevel?: JLPTLevel
+	difficulty: Difficulty
+	lastStudiedAt?: Date
 	examples: ExampleSentence[]
 	tags: string[]
 	relatedWords: UUIDv4[]
 	relatedKanjis: UUIDv4[]
 	relatedCounters: UUIDv4[]
-	lastStudiedAt?: Date
 }
 
 export interface SimpleWord extends Word {
@@ -54,6 +54,7 @@ export interface Counter {
 	jlptLevel?: JLPTLevel
 	difficulty: Difficulty
 	lastStudiedAt?: Date
+	examples: ExampleSentence[]
 	tags: string[]
 	relatedWords: UUIDv4[]
 	relatedKanjis: UUIDv4[]
