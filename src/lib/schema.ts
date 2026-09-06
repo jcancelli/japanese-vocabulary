@@ -84,6 +84,9 @@ export const VocabularyItemSchema = z.object({
 	difficulty: DifficultySchema,
 	lastStudiedAt: z.date().optional(),
 	tags: TagsSchema,
+	relatedWords: UUIDv4SetSchema,
+	relatedKanjis: UUIDv4SetSchema,
+	relatedCounters: UUIDv4SetSchema,
 })
 export const WordSchema = VocabularyItemSchema.extend({
 	itemType: z.literal(VocabularyItemType.WORD),
@@ -91,9 +94,6 @@ export const WordSchema = VocabularyItemSchema.extend({
 	kanji: KanjiStringSchema.nonempty("Empty field").optional(),
 	kana: KanaStringSchema.nonempty("Empty field"),
 	examples: z.array(ExampleSentenceSchema),
-	relatedWords: UUIDv4SetSchema,
-	relatedKanjis: UUIDv4SetSchema,
-	relatedCounters: UUIDv4SetSchema,
 })
 export const SimpleWordSchema = WordSchema.extend({
 	wordType: z.literal(WordType.SIMPLE),
@@ -114,17 +114,11 @@ export const KanjiSchema = VocabularyItemSchema.extend({
 	onyomi: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate on'yomi"),
 	kunyomi: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate kun'yomi"),
 	nanori: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate naori"),
-	relatedWords: UUIDv4SetSchema,
-	relatedKanjis: UUIDv4SetSchema,
-	relatedCounters: UUIDv4SetSchema,
 })
 export const CounterSchema = VocabularyItemSchema.extend({
 	counter: KanaStringSchema.nonempty("Empty field"),
 	variants: CounterVariantsSchema,
 	examples: z.array(ExampleSentenceSchema),
-	relatedWords: UUIDv4SetSchema,
-	relatedKanjis: UUIDv4SetSchema,
-	relatedCounters: UUIDv4SetSchema,
 })
 
 export function isSetLikeArray<T>(array: T[]): boolean {

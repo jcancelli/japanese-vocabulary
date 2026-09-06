@@ -27,6 +27,9 @@ export abstract class VocabularyItemDTO implements VocabularyItem {
 	difficulty: Difficulty
 	lastStudiedAt: Date | undefined
 	tags: string[]
+	relatedWords: UUIDv4[]
+	relatedKanjis: UUIDv4[]
+	relatedCounters: UUIDv4[]
 
 	constructor(
 		id: UUIDv4,
@@ -35,6 +38,9 @@ export abstract class VocabularyItemDTO implements VocabularyItem {
 		difficulty: Difficulty,
 		lastStudiedAt: Date | undefined,
 		tags: Iterable<string>,
+		relatedWords: Iterable<UUIDv4>,
+		relatedKanjis: Iterable<UUIDv4>,
+		relatedCounters: Iterable<UUIDv4>,
 	) {
 		this.id = $state(id)
 		this.meanings = $state(Array.from(meanings).map(MeaningDTO.fromInterface))
@@ -44,6 +50,9 @@ export abstract class VocabularyItemDTO implements VocabularyItem {
 			lastStudiedAt !== undefined ? new Date(lastStudiedAt) : undefined,
 		)
 		this.tags = $state(Array.from(tags))
+		this.relatedWords = $state(Array.from(relatedWords))
+		this.relatedKanjis = $state(Array.from(relatedKanjis))
+		this.relatedCounters = $state(Array.from(relatedCounters))
 	}
 
 	abstract get itemType(): VocabularyItemType
@@ -58,9 +67,6 @@ export abstract class WordDTO extends VocabularyItemDTO implements Word {
 	kanji: string | undefined
 	kana: string
 	examples: ExampleSentenceDTO[]
-	relatedWords: UUIDv4[]
-	relatedKanjis: UUIDv4[]
-	relatedCounters: UUIDv4[]
 
 	constructor(
 		id: UUIDv4,
@@ -76,13 +82,20 @@ export abstract class WordDTO extends VocabularyItemDTO implements Word {
 		relatedKanjis: Iterable<UUIDv4>,
 		relatedCounters: Iterable<UUIDv4>,
 	) {
-		super(id, meanings, jlptLevel, difficulty, lastStudiedAt, tags)
+		super(
+			id,
+			meanings,
+			jlptLevel,
+			difficulty,
+			lastStudiedAt,
+			tags,
+			relatedWords,
+			relatedKanjis,
+			relatedCounters,
+		)
 		this.kanji = $state(kanji)
 		this.kana = $state(kana)
 		this.examples = $state(Array.from(examples).map(ExampleSentenceDTO.fromInterface))
-		this.relatedWords = $state(Array.from(relatedWords))
-		this.relatedKanjis = $state(Array.from(relatedKanjis))
-		this.relatedCounters = $state(Array.from(relatedCounters))
 	}
 
 	get itemType(): VocabularyItemType.WORD {
@@ -303,9 +316,6 @@ export class KanjiDTO extends VocabularyItemDTO implements Kanji {
 	onyomi: string[]
 	kunyomi: string[]
 	nanori: string[]
-	relatedWords: UUIDv4[]
-	relatedKanjis: UUIDv4[]
-	relatedCounters: UUIDv4[]
 
 	constructor(
 		id: UUIDv4 = crypto.randomUUID(),
@@ -322,14 +332,21 @@ export class KanjiDTO extends VocabularyItemDTO implements Kanji {
 		relatedKanjis: Iterable<UUIDv4> = [],
 		relatedCounters: Iterable<UUIDv4> = [],
 	) {
-		super(id, meanings, jlptLevel, difficulty, lastStudiedAt, tags)
+		super(
+			id,
+			meanings,
+			jlptLevel,
+			difficulty,
+			lastStudiedAt,
+			tags,
+			relatedWords,
+			relatedKanjis,
+			relatedCounters,
+		)
 		this.kanji = $state(kanji)
 		this.onyomi = $state(Array.from(onyomi))
 		this.kunyomi = $state(Array.from(kunyomi))
 		this.nanori = $state(Array.from(nanori))
-		this.relatedWords = $state(Array.from(relatedWords))
-		this.relatedKanjis = $state(Array.from(relatedKanjis))
-		this.relatedCounters = $state(Array.from(relatedCounters))
 	}
 
 	copy(): KanjiDTO {
@@ -367,9 +384,6 @@ export class CounterDTO extends VocabularyItemDTO implements Counter {
 	counter: string
 	variants: CounterVariantsDTO
 	examples: ExampleSentenceDTO[]
-	relatedWords: UUIDv4[]
-	relatedKanjis: UUIDv4[]
-	relatedCounters: UUIDv4[]
 
 	constructor(
 		id: UUIDv4 = crypto.randomUUID(),
@@ -385,13 +399,20 @@ export class CounterDTO extends VocabularyItemDTO implements Counter {
 		relatedKanjis: Iterable<UUIDv4> = [],
 		relatedCounters: Iterable<UUIDv4> = [],
 	) {
-		super(id, meanings, jlptLevel, difficulty, lastStudiedAt, tags)
+		super(
+			id,
+			meanings,
+			jlptLevel,
+			difficulty,
+			lastStudiedAt,
+			tags,
+			relatedWords,
+			relatedKanjis,
+			relatedCounters,
+		)
 		this.counter = $state(counter)
 		this.variants = $state(CounterVariantsDTO.fromInterface(variants))
 		this.examples = $state(Array.from(examples).map(ExampleSentenceDTO.fromInterface))
-		this.relatedWords = $state(Array.from(relatedWords))
-		this.relatedKanjis = $state(Array.from(relatedKanjis))
-		this.relatedCounters = $state(Array.from(relatedCounters))
 	}
 
 	get itemType(): VocabularyItemType.COUNTER {

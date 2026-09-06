@@ -8,6 +8,9 @@ export interface VocabularyItem {
 	difficulty: Difficulty
 	lastStudiedAt?: Date | undefined
 	tags: string[]
+	relatedWords: UUIDv4[]
+	relatedKanjis: UUIDv4[]
+	relatedCounters: UUIDv4[]
 }
 
 export interface Word extends VocabularyItem {
@@ -16,9 +19,6 @@ export interface Word extends VocabularyItem {
 	kanji?: string | undefined
 	kana: string
 	examples: ExampleSentence[]
-	relatedWords: UUIDv4[]
-	relatedKanjis: UUIDv4[]
-	relatedCounters: UUIDv4[]
 }
 
 export interface SimpleWord extends Word {
@@ -43,9 +43,6 @@ export interface Kanji extends VocabularyItem {
 	onyomi: string[]
 	kunyomi: string[]
 	nanori: string[]
-	relatedWords: UUIDv4[]
-	relatedKanjis: UUIDv4[]
-	relatedCounters: UUIDv4[]
 }
 
 export interface Counter extends VocabularyItem {
@@ -53,9 +50,6 @@ export interface Counter extends VocabularyItem {
 	counter: string
 	variants: CounterVariants
 	examples: ExampleSentence[]
-	relatedWords: UUIDv4[]
-	relatedKanjis: UUIDv4[]
-	relatedCounters: UUIDv4[]
 }
 
 export interface CounterVariants {
@@ -133,4 +127,16 @@ export function stripId<ID, T extends { id: ID }>(object: T): Omit<T, "id"> {
 	const copy = { ...object } as any
 	delete copy["id"]
 	return copy
+}
+
+export function isWord(it: any): it is Word {
+	return !!it && typeof it === "object" && "wordType" in it && typeof it.wordType === "string"
+}
+
+export function isKanji(it: any): it is Kanji {
+	return !!it && typeof it === "object" && "nanori" in it && Array.isArray(it.nanori)
+}
+
+export function isCounter(it: any): it is Counter {
+	return !!it && typeof it === "object" && "counter" in it && typeof it.counter === "string"
 }
