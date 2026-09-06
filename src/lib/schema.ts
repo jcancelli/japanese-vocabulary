@@ -1,15 +1,30 @@
 import z from "zod"
-import { AdjectiveType, JLPTLevel, SimpleWordType, VerbType, WordType, type UUIDv4 } from "./model"
+import {
+	AdjectiveType,
+	JLPTLevel,
+	SimpleWordType,
+	VerbType,
+	VocabularyItemType,
+	WordType,
+	type UUIDv4,
+} from "./model"
 import { hiraganaStringRegex, kanaStringRegex, kanjiKanaStringRegex } from "./japanese/regex"
 import { capitalizeString } from "./strings"
 
 export const UUIDv4Schema = z.custom<UUIDv4>((value) => {
 	return z.uuidv4().safeParse(value).success
 }, "Invalid UUIDv4")
+export const UUIDv4SetSchema = z.array(UUIDv4Schema).refine(isSetLikeArray, "Duplicate id")
+
+export const VocabularyItemTypeSchema = z.enum(VocabularyItemType, "Invalid vocabulary item type")
 export const WordTypeSchema = z.enum(WordType, "Invalid word type")
 export const SimpleWordTypeSchema = z.enum(SimpleWordType, "Invalid simple word type")
+export const VerbTypeSchema = z.enum(VerbType, "Invalid verb type")
+export const AdjectiveTypeSchema = z.enum(AdjectiveType, "Invalid adjective type")
+
 export const JLPTLevelSchema = z.enum(JLPTLevel, "Invalid JLPT level")
 export const DifficultySchema = z.int().min(1, "Invalid difficulty").max(5, "Invalid difficulty")
+
 export const KanjiStringSchema = z
 	.string()
 	.trim()
@@ -19,12 +34,9 @@ export const HiraganaStringSchema = z
 	.string()
 	.trim()
 	.regex(hiraganaStringRegex, "Non-hiragana character found")
-export const VerbTypeSchema = z.enum(VerbType, "Invalid verb type")
-export const VerbTransitivitySchema = z.object({
-	transitive: z.boolean(),
-	intransitive: z.boolean(),
-})
-export const AdjectiveTypeSchema = z.enum(AdjectiveType, "Invalid adjective type")
+
+export const TagSchema = z.string().regex(/^[a-z\-]+$/g, "Invalid character")
+export const TagsSchema = z.array(TagSchema).refine(isSetLikeArray, "Duplicate tag")
 export const MeaningSchema = z.object(
 	{
 		meaning: z.string().trim().nonempty().transform(capitalizeString),
@@ -37,6 +49,7 @@ export const MeaningSchema = z.object(
 	"Invalid meaning",
 )
 export const MeaningsSchema = z.array(MeaningSchema).nonempty("At least one meaning is needed")
+
 export const ExampleSentenceSchema = z.object(
 	{
 		japanese: z.string().trim().nonempty().transform(capitalizeString),
@@ -44,6 +57,11 @@ export const ExampleSentenceSchema = z.object(
 	},
 	"Invalid example sentence",
 )
+
+export const VerbTransitivitySchema = z.object({
+	transitive: z.boolean(),
+	intransitive: z.boolean(),
+})
 export const CounterVariantsSchema = z.object({
 	1: KanaStringSchema.optional(),
 	2: KanaStringSchema.optional(),
@@ -57,20 +75,22 @@ export const CounterVariantsSchema = z.object({
 	10: KanaStringSchema.optional(),
 	11: KanaStringSchema.optional(),
 })
-export const TagSchema = z.string().regex(/^[a-z\-]+$/g, "Invalid character")
-export const TagsSchema = z.array(TagSchema).refine(isSetLikeArray, "Duplicate tag")
-export const UUIDv4SetSchema = z.array(UUIDv4Schema).refine(isSetLikeArray, "Duplicate id")
-export const WordSchema = z.object({
+
+export const VocabularyItemSchema = z.object({
 	id: UUIDv4Schema,
-	wordType: WordTypeSchema,
-	kanji: KanjiStringSchema.nonempty("Empty field").optional(),
-	kana: KanaStringSchema.nonempty("Empty field"),
+	itemType: VocabularyItemTypeSchema,
 	meanings: MeaningsSchema,
 	jlptLevel: JLPTLevelSchema.optional(),
 	difficulty: DifficultySchema,
 	lastStudiedAt: z.date().optional(),
-	examples: z.array(ExampleSentenceSchema),
 	tags: TagsSchema,
+})
+export const WordSchema = VocabularyItemSchema.extend({
+	itemType: z.literal(VocabularyItemType.WORD),
+	wordType: WordTypeSchema,
+	kanji: KanjiStringSchema.nonempty("Empty field").optional(),
+	kana: KanaStringSchema.nonempty("Empty field"),
+	examples: z.array(ExampleSentenceSchema),
 	relatedWords: UUIDv4SetSchema,
 	relatedKanjis: UUIDv4SetSchema,
 	relatedCounters: UUIDv4SetSchema,
@@ -88,31 +108,20 @@ export const AdjectiveSchema = WordSchema.extend({
 	wordType: z.literal(WordType.ADJECTIVE),
 	adjectiveType: AdjectiveTypeSchema.optional(),
 })
-export const KanjiSchema = z.object({
-	id: UUIDv4Schema,
+export const KanjiSchema = VocabularyItemSchema.extend({
+	itemType: z.literal(VocabularyItemType.KANJI),
 	kanji: KanjiStringSchema.nonempty("Empty field"),
 	onyomi: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate on'yomi"),
 	kunyomi: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate kun'yomi"),
 	nanori: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate naori"),
-	meanings: MeaningsSchema,
-	jlptLevel: JLPTLevelSchema.optional(),
-	difficulty: DifficultySchema,
-	lastStudiedAt: z.date().optional(),
-	tags: TagsSchema,
 	relatedWords: UUIDv4SetSchema,
 	relatedKanjis: UUIDv4SetSchema,
 	relatedCounters: UUIDv4SetSchema,
 })
-export const CounterSchema = z.object({
-	id: UUIDv4Schema,
-	writing: KanaStringSchema.nonempty("Empty field"),
+export const CounterSchema = VocabularyItemSchema.extend({
+	counter: KanaStringSchema.nonempty("Empty field"),
 	variants: CounterVariantsSchema,
-	meanings: MeaningsSchema,
-	jlptLevel: JLPTLevelSchema.optional(),
-	difficulty: DifficultySchema,
-	lastStudiedAt: z.date().optional(),
 	examples: z.array(ExampleSentenceSchema),
-	tags: TagsSchema,
 	relatedWords: UUIDv4SetSchema,
 	relatedKanjis: UUIDv4SetSchema,
 	relatedCounters: UUIDv4SetSchema,

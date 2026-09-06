@@ -1,158 +1,201 @@
 import {
-	AdjectiveType,
 	JLPTLevel,
-	type VerbTransitivity,
-	VerbType,
-	Difficulty,
+	VocabularyItemType,
 	WordType,
-	type Adjective,
-	type Adverb,
-	type Noun,
-	type PreNounAdjectival,
-	type UUIDv4,
-	type Verb,
+	SimpleWordType,
+	VerbType,
+	AdjectiveType,
+	type VerbTransitivity,
+	type Difficulty,
 	type Word,
-	type WordMeaning,
-	type ExampleSentence,
-	type KanjiMeaning,
+	type SimpleWord,
+	type Verb,
+	type Adjective,
 	type Kanji,
+	type UUIDv4,
+	type Meaning,
+	type ExampleSentence,
+	type Counter,
+	type CounterVariants,
+	type VocabularyItem,
 } from "./model"
 
-export abstract class WordDTO implements Word {
+export abstract class VocabularyItemDTO implements VocabularyItem {
 	id: UUIDv4
-	abstract get wordType(): WordType
-	jlptLevel: JLPTLevel
+	meanings: MeaningDTO[]
+	jlptLevel: JLPTLevel | undefined
 	difficulty: Difficulty
-	kanji?: string | undefined
-	kana: string
-	meanings: WordMeaningDTO[]
-	examples: ExampleSentenceDTO[]
+	lastStudiedAt: Date | undefined
 	tags: string[]
-	relatedWords: UUIDv4[]
-	relatedKanjis: UUIDv4[]
-	lastStudiedAt: Date
 
 	constructor(
 		id: UUIDv4,
-		jlptLevel: JLPTLevel,
+		meanings: Iterable<Meaning>,
+		jlptLevel: JLPTLevel | undefined,
 		difficulty: Difficulty,
+		lastStudiedAt: Date | undefined,
+		tags: Iterable<string>,
+	) {
+		this.id = $state(id)
+		this.meanings = $state(Array.from(meanings).map(MeaningDTO.fromInterface))
+		this.jlptLevel = $state(jlptLevel)
+		this.difficulty = $state(difficulty)
+		this.lastStudiedAt = $state(
+			lastStudiedAt !== undefined ? new Date(lastStudiedAt) : undefined,
+		)
+		this.tags = $state(Array.from(tags))
+	}
+
+	abstract get itemType(): VocabularyItemType
+	abstract get primaryWriting(): string
+
+	get primaryMeaning(): Readonly<MeaningDTO> {
+		return this.meanings[0]
+	}
+}
+
+export abstract class WordDTO extends VocabularyItemDTO implements Word {
+	kanji: string | undefined
+	kana: string
+	examples: ExampleSentenceDTO[]
+	relatedWords: UUIDv4[]
+	relatedKanjis: UUIDv4[]
+	relatedCounters: UUIDv4[]
+
+	constructor(
+		id: UUIDv4,
 		kanji: string | undefined,
 		kana: string,
-		meanings: Iterable<WordMeaning>,
+		meanings: Iterable<Meaning>,
+		jlptLevel: JLPTLevel | undefined,
+		difficulty: Difficulty,
+		lastStudiedAt: Date | undefined,
 		examples: Iterable<ExampleSentence>,
 		tags: Iterable<string>,
 		relatedWords: Iterable<UUIDv4>,
 		relatedKanjis: Iterable<UUIDv4>,
-		lastStudiedAt: Date,
+		relatedCounters: Iterable<UUIDv4>,
 	) {
-		this.id = $state(id)
-		this.jlptLevel = $state(jlptLevel)
-		this.difficulty = $state(difficulty)
+		super(id, meanings, jlptLevel, difficulty, lastStudiedAt, tags)
 		this.kanji = $state(kanji)
 		this.kana = $state(kana)
-		this.meanings = $state(Array.from(meanings).map(WordMeaningDTO.fromInterface))
 		this.examples = $state(Array.from(examples).map(ExampleSentenceDTO.fromInterface))
-		this.tags = $state(Array.from(tags))
 		this.relatedWords = $state(Array.from(relatedWords))
 		this.relatedKanjis = $state(Array.from(relatedKanjis))
-		this.lastStudiedAt = $state(new Date(lastStudiedAt))
+		this.relatedCounters = $state(Array.from(relatedCounters))
 	}
 
-	abstract copy(): WordDTO
+	get itemType(): VocabularyItemType.WORD {
+		return VocabularyItemType.WORD
+	}
 
 	get primaryWriting(): string {
 		return this.kanji ?? this.kana
 	}
 
-	get primaryMeaning(): string {
-		return this.meanings[0].meaning
-	}
+	abstract get wordType(): WordType
+
+	abstract copy(): WordDTO
 }
 
-export class NounDTO extends WordDTO implements Noun {
+export class SimpleWordDTO extends WordDTO implements SimpleWord {
+	wordSubtypes: SimpleWordType[]
+
 	constructor(
 		id: UUIDv4 = crypto.randomUUID(),
-		jlptLevel: JLPTLevel = JLPTLevel.N5,
-		difficulty: Difficulty = Difficulty.DONT_KNOW,
 		kanji: string | undefined = undefined,
 		kana: string = "",
-		meanings: Iterable<WordMeaning> = [],
+		meanings: Iterable<Meaning> = [],
+		jlptLevel: JLPTLevel | undefined = undefined,
+		difficulty: Difficulty = 1,
+		lastStudiedAt: Date | undefined = undefined,
 		examples: Iterable<ExampleSentence> = [],
 		tags: Iterable<string> = [],
 		relatedWords: Iterable<UUIDv4> = [],
 		relatedKanjis: Iterable<UUIDv4> = [],
-		lastStudiedAt: Date = new Date(0),
+		relatedCounters: Iterable<UUIDv4> = [],
+		wordSubtypes: Iterable<SimpleWordType> = [],
 	) {
 		super(
 			id,
-			jlptLevel,
-			difficulty,
 			kanji,
 			kana,
 			meanings,
+			jlptLevel,
+			difficulty,
+			lastStudiedAt,
 			examples,
 			tags,
 			relatedWords,
 			relatedKanjis,
-			lastStudiedAt,
+			relatedCounters,
 		)
+		this.wordSubtypes = $state(Array.from(wordSubtypes))
 	}
 
-	get wordType(): WordType.NOUN {
-		return WordType.NOUN
+	get wordType(): WordType.SIMPLE {
+		return WordType.SIMPLE
 	}
 
-	copy(): NounDTO {
-		return new NounDTO(
+	copy(): SimpleWordDTO {
+		return new SimpleWordDTO(
 			this.id,
-			this.jlptLevel,
-			this.difficulty,
 			this.kanji,
 			this.kana,
 			this.meanings,
+			this.jlptLevel,
+			this.difficulty,
+			this.lastStudiedAt,
 			this.examples,
 			this.tags,
 			this.relatedWords,
 			this.relatedKanjis,
-			this.lastStudiedAt,
+			this.relatedCounters,
+			this.wordSubtypes,
 		)
 	}
 }
 
 export class VerbDTO extends WordDTO implements Verb {
-	verbType: VerbType
-	transitivity: VerbTransitivityDTO
+	verbType: VerbType | undefined
+	transitivity: VerbTransitivityDTO | undefined
 
 	constructor(
 		id: UUIDv4 = crypto.randomUUID(),
-		jlptLevel: JLPTLevel = JLPTLevel.N5,
-		difficulty: Difficulty = Difficulty.DONT_KNOW,
 		kanji: string | undefined = undefined,
 		kana: string = "",
-		meanings: Iterable<WordMeaning> = [],
+		meanings: Iterable<Meaning> = [],
+		jlptLevel: JLPTLevel | undefined = undefined,
+		difficulty: Difficulty = 1,
+		lastStudiedAt: Date | undefined = undefined,
 		examples: Iterable<ExampleSentence> = [],
 		tags: Iterable<string> = [],
 		relatedWords: Iterable<UUIDv4> = [],
 		relatedKanjis: Iterable<UUIDv4> = [],
-		lastStudiedAt: Date = new Date(0),
-		verbType: VerbType = VerbType.GODAN,
-		transitivity: VerbTransitivity = { transitive: false, intransitive: false },
+		relatedCounters: Iterable<UUIDv4> = [],
+		verbType: VerbType | undefined = undefined,
+		transitivity: VerbTransitivity | undefined = undefined,
 	) {
 		super(
 			id,
-			jlptLevel,
-			difficulty,
 			kanji,
 			kana,
 			meanings,
+			jlptLevel,
+			difficulty,
+			lastStudiedAt,
 			examples,
 			tags,
 			relatedWords,
 			relatedKanjis,
-			lastStudiedAt,
+			relatedCounters,
 		)
 		this.verbType = $state(verbType)
-		this.transitivity = $state(VerbTransitivityDTO.fromInterface(transitivity))
+		this.transitivity = $state(
+			transitivity !== undefined ?
+				VerbTransitivityDTO.fromInterface(transitivity)
+			:	undefined,
+		)
 	}
 
 	get wordType(): WordType.VERB {
@@ -162,16 +205,17 @@ export class VerbDTO extends WordDTO implements Verb {
 	copy(): VerbDTO {
 		return new VerbDTO(
 			this.id,
-			this.jlptLevel,
-			this.difficulty,
 			this.kanji,
 			this.kana,
 			this.meanings,
+			this.jlptLevel,
+			this.difficulty,
+			this.lastStudiedAt,
 			this.examples,
 			this.tags,
 			this.relatedWords,
 			this.relatedKanjis,
-			this.lastStudiedAt,
+			this.relatedCounters,
 			this.verbType,
 			this.transitivity,
 		)
@@ -196,85 +240,37 @@ export class VerbTransitivityDTO implements VerbTransitivity {
 	}
 }
 
-export class AdverbDTO extends WordDTO implements Adverb {
-	constructor(
-		id: UUIDv4 = crypto.randomUUID(),
-		jlptLevel: JLPTLevel = JLPTLevel.N5,
-		difficulty: Difficulty = Difficulty.DONT_KNOW,
-		kanji: string | undefined = undefined,
-		kana: string = "",
-		meanings: Iterable<WordMeaning> = [],
-		examples: Iterable<ExampleSentence> = [],
-		tags: Iterable<string> = [],
-		relatedWords: Iterable<UUIDv4> = [],
-		relatedKanjis: Iterable<UUIDv4> = [],
-		lastStudiedAt: Date = new Date(0),
-	) {
-		super(
-			id,
-			jlptLevel,
-			difficulty,
-			kanji,
-			kana,
-			meanings,
-			examples,
-			tags,
-			relatedWords,
-			relatedKanjis,
-			lastStudiedAt,
-		)
-	}
-
-	get wordType(): WordType.ADVERB {
-		return WordType.ADVERB
-	}
-
-	copy(): AdverbDTO {
-		return new AdverbDTO(
-			this.id,
-			this.jlptLevel,
-			this.difficulty,
-			this.kanji,
-			this.kana,
-			this.meanings,
-			this.examples,
-			this.tags,
-			this.relatedWords,
-			this.relatedKanjis,
-			this.lastStudiedAt,
-		)
-	}
-}
-
 export class AdjectiveDTO extends WordDTO implements Adjective {
-	adjectiveType: AdjectiveType
+	adjectiveType: AdjectiveType | undefined
 
 	constructor(
 		id: UUIDv4 = crypto.randomUUID(),
-		jlptLevel: JLPTLevel = JLPTLevel.N5,
-		difficulty: Difficulty = Difficulty.DONT_KNOW,
 		kanji: string | undefined = undefined,
 		kana: string = "",
-		meanings: Iterable<WordMeaning> = [],
+		meanings: Iterable<Meaning> = [],
+		jlptLevel: JLPTLevel | undefined = undefined,
+		difficulty: Difficulty = 1,
+		lastStudiedAt: Date | undefined = undefined,
 		examples: Iterable<ExampleSentence> = [],
 		tags: Iterable<string> = [],
 		relatedWords: Iterable<UUIDv4> = [],
 		relatedKanjis: Iterable<UUIDv4> = [],
-		lastStudiedAt: Date = new Date(0),
-		adjectiveType: AdjectiveType = AdjectiveType.I,
+		relatedCounters: Iterable<UUIDv4> = [],
+		adjectiveType: AdjectiveType | undefined = undefined,
 	) {
 		super(
 			id,
-			jlptLevel,
-			difficulty,
 			kanji,
 			kana,
 			meanings,
+			jlptLevel,
+			difficulty,
+			lastStudiedAt,
 			examples,
 			tags,
 			relatedWords,
 			relatedKanjis,
-			lastStudiedAt,
+			relatedCounters,
 		)
 		this.adjectiveType = $state(adjectiveType)
 	}
@@ -286,84 +282,30 @@ export class AdjectiveDTO extends WordDTO implements Adjective {
 	copy(): AdjectiveDTO {
 		return new AdjectiveDTO(
 			this.id,
-			this.jlptLevel,
-			this.difficulty,
 			this.kanji,
 			this.kana,
 			this.meanings,
+			this.jlptLevel,
+			this.difficulty,
+			this.lastStudiedAt,
 			this.examples,
 			this.tags,
 			this.relatedWords,
 			this.relatedKanjis,
-			this.lastStudiedAt,
+			this.relatedCounters,
 			this.adjectiveType,
 		)
 	}
 }
 
-export class PreNounAdjectivalDTO extends WordDTO implements PreNounAdjectival {
-	constructor(
-		id: UUIDv4 = crypto.randomUUID(),
-		jlptLevel: JLPTLevel = JLPTLevel.N5,
-		difficulty: Difficulty = Difficulty.DONT_KNOW,
-		kanji: string | undefined = undefined,
-		kana: string = "",
-		meanings: Iterable<WordMeaning> = [],
-		examples: Iterable<ExampleSentence> = [],
-		tags: Iterable<string> = [],
-		relatedWords: Iterable<UUIDv4> = [],
-		relatedKanjis: Iterable<UUIDv4> = [],
-		lastStudiedAt: Date = new Date(0),
-	) {
-		super(
-			id,
-			jlptLevel,
-			difficulty,
-			kanji,
-			kana,
-			meanings,
-			examples,
-			tags,
-			relatedWords,
-			relatedKanjis,
-			lastStudiedAt,
-		)
-	}
-
-	get wordType(): WordType.PRE_NOUN_ADJECTIVAL {
-		return WordType.PRE_NOUN_ADJECTIVAL
-	}
-
-	copy(): PreNounAdjectivalDTO {
-		return new PreNounAdjectivalDTO(
-			this.id,
-			this.jlptLevel,
-			this.difficulty,
-			this.kanji,
-			this.kana,
-			this.meanings,
-			this.examples,
-			this.tags,
-			this.relatedWords,
-			this.relatedKanjis,
-			this.lastStudiedAt,
-		)
-	}
-}
-
-export class KanjiDTO implements Kanji {
-	id: UUIDv4
+export class KanjiDTO extends VocabularyItemDTO implements Kanji {
 	kanji: string
 	onyomi: string[]
 	kunyomi: string[]
 	nanori: string[]
-	meanings: KanjiMeaningDTO[]
-	jlptLevel: JLPTLevel
-	difficulty: Difficulty
-	lastStudiedAt: Date
-	tags: string[]
 	relatedWords: UUIDv4[]
 	relatedKanjis: UUIDv4[]
+	relatedCounters: UUIDv4[]
 
 	constructor(
 		id: UUIDv4 = crypto.randomUUID(),
@@ -371,26 +313,23 @@ export class KanjiDTO implements Kanji {
 		onyomi: Iterable<string> = [],
 		kunyomi: Iterable<string> = [],
 		nanori: Iterable<string> = [],
-		meanings: Iterable<KanjiMeaning> = [],
-		jlptLevel: JLPTLevel = JLPTLevel.N5,
-		difficulty: Difficulty = Difficulty.DONT_KNOW,
-		lastStudiedAt: Date = new Date(0),
+		meanings: Iterable<Meaning> = [],
+		jlptLevel: JLPTLevel | undefined = undefined,
+		difficulty: Difficulty = 1,
+		lastStudiedAt: Date | undefined = undefined,
 		tags: Iterable<string> = [],
 		relatedWords: Iterable<UUIDv4> = [],
 		relatedKanjis: Iterable<UUIDv4> = [],
+		relatedCounters: Iterable<UUIDv4> = [],
 	) {
-		this.id = $state(id)
+		super(id, meanings, jlptLevel, difficulty, lastStudiedAt, tags)
 		this.kanji = $state(kanji)
 		this.onyomi = $state(Array.from(onyomi))
 		this.kunyomi = $state(Array.from(kunyomi))
 		this.nanori = $state(Array.from(nanori))
-		this.meanings = $state(Array.from(meanings).map(KanjiMeaningDTO.fromInterface))
-		this.jlptLevel = $state(jlptLevel)
-		this.difficulty = $state(difficulty)
-		this.lastStudiedAt = $state(new Date(lastStudiedAt))
-		this.tags = $state(Array.from(tags))
 		this.relatedWords = $state(Array.from(relatedWords))
 		this.relatedKanjis = $state(Array.from(relatedKanjis))
+		this.relatedCounters = $state(Array.from(relatedCounters))
 	}
 
 	copy(): KanjiDTO {
@@ -407,47 +346,135 @@ export class KanjiDTO implements Kanji {
 			this.tags,
 			this.relatedWords,
 			this.relatedKanjis,
+			this.relatedCounters,
 		)
 	}
 
-	get primaryMeaning(): Readonly<KanjiMeaningDTO> {
+	get itemType(): VocabularyItemType.KANJI {
+		return VocabularyItemType.KANJI
+	}
+
+	get primaryWriting(): string {
+		return this.kanji
+	}
+
+	get primaryMeaning(): Readonly<MeaningDTO> {
 		return this.meanings[0]
 	}
 }
 
-export class WordMeaningDTO implements WordMeaning {
-	meaning: string
-	note?: string | undefined
+export class CounterDTO extends VocabularyItemDTO implements Counter {
+	counter: string
+	variants: CounterVariantsDTO
+	examples: ExampleSentenceDTO[]
+	relatedWords: UUIDv4[]
+	relatedKanjis: UUIDv4[]
+	relatedCounters: UUIDv4[]
 
-	constructor(meaning: string = "", note?: string | undefined) {
-		this.meaning = $state(meaning)
-		this.note = $state(note)
+	constructor(
+		id: UUIDv4 = crypto.randomUUID(),
+		counter: string = "",
+		variants: CounterVariants = {},
+		meanings: Iterable<Meaning> = [],
+		jlptLevel: JLPTLevel | undefined = undefined,
+		difficulty: Difficulty = 1,
+		lastStudiedAt: Date | undefined = undefined,
+		examples: Iterable<ExampleSentence> = [],
+		tags: Iterable<string> = [],
+		relatedWords: Iterable<UUIDv4> = [],
+		relatedKanjis: Iterable<UUIDv4> = [],
+		relatedCounters: Iterable<UUIDv4> = [],
+	) {
+		super(id, meanings, jlptLevel, difficulty, lastStudiedAt, tags)
+		this.counter = $state(counter)
+		this.variants = $state(CounterVariantsDTO.fromInterface(variants))
+		this.examples = $state(Array.from(examples).map(ExampleSentenceDTO.fromInterface))
+		this.relatedWords = $state(Array.from(relatedWords))
+		this.relatedKanjis = $state(Array.from(relatedKanjis))
+		this.relatedCounters = $state(Array.from(relatedCounters))
 	}
 
-	static fromInterface(meaning: WordMeaning): WordMeaningDTO {
-		return new WordMeaningDTO(meaning.meaning, meaning.note)
+	get itemType(): VocabularyItemType.COUNTER {
+		return VocabularyItemType.COUNTER
 	}
 
-	copy(): WordMeaningDTO {
-		return new WordMeaningDTO(this.meaning, this.note)
+	get primaryWriting(): string {
+		return this.counter
+	}
+
+	get primaryMeaning(): Readonly<MeaningDTO> {
+		return this.meanings[0]
+	}
+
+	copy(): CounterDTO {
+		return new CounterDTO(
+			this.id,
+			this.counter,
+			this.variants,
+			this.meanings,
+			this.jlptLevel,
+			this.difficulty,
+			this.lastStudiedAt,
+			this.examples,
+			this.tags,
+			this.relatedWords,
+			this.relatedKanjis,
+			this.relatedCounters,
+		)
 	}
 }
 
-export class KanjiMeaningDTO implements KanjiMeaning {
+export class CounterVariantsDTO implements CounterVariants {
+	1: string | undefined
+	2: string | undefined
+	3: string | undefined
+	4: string | undefined
+	5: string | undefined
+	6: string | undefined
+	7: string | undefined
+	8: string | undefined
+	9: string | undefined
+	10: string | undefined
+	11: string | undefined
+
+	constructor(variants: CounterVariants = {}) {
+		this[1] = $state(variants[1])
+		this[2] = $state(variants[2])
+		this[3] = $state(variants[3])
+		this[4] = $state(variants[4])
+		this[5] = $state(variants[5])
+		this[6] = $state(variants[6])
+		this[7] = $state(variants[7])
+		this[8] = $state(variants[8])
+		this[9] = $state(variants[9])
+		this[10] = $state(variants[10])
+		this[11] = $state(variants[11])
+	}
+
+	static fromInterface(variants: CounterVariants): CounterVariantsDTO {
+		return new CounterVariantsDTO(variants)
+	}
+
+	copy(): CounterVariantsDTO {
+		return new CounterVariantsDTO(this)
+	}
+}
+
+export class MeaningDTO implements Meaning {
 	meaning: string
-	note?: string | undefined
+	note: string | undefined
 
 	constructor(meaning: string = "", note?: string | undefined) {
 		this.meaning = $state(meaning)
 		this.note = $state(note)
 	}
 
-	static fromInterface(meaning: KanjiMeaning): KanjiMeaningDTO {
-		return new KanjiMeaningDTO(meaning.meaning, meaning.note)
+	static fromInterface(meaning: Meaning): MeaningDTO {
+		return new MeaningDTO(meaning.meaning, meaning.note)
 	}
 
-	copy(): KanjiMeaningDTO {
-		return new KanjiMeaningDTO(this.meaning, this.note)
+	copy(): MeaningDTO {
+		return new MeaningDTO(this.meaning, this.note)
 	}
 }
 

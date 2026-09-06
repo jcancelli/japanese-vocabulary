@@ -1,14 +1,21 @@
-export interface Word {
+export interface VocabularyItem {
 	id: UUIDv4
-	wordType: WordType
-	kanji?: string
-	kana: string
+	itemType: VocabularyItemType
+	readonly primaryWriting: string
+	readonly primaryMeaning: Readonly<Meaning>
 	meanings: Meaning[]
-	jlptLevel?: JLPTLevel
+	jlptLevel?: JLPTLevel | undefined
 	difficulty: Difficulty
-	lastStudiedAt?: Date
-	examples: ExampleSentence[]
+	lastStudiedAt?: Date | undefined
 	tags: string[]
+}
+
+export interface Word extends VocabularyItem {
+	itemType: VocabularyItemType.WORD
+	wordType: WordType
+	kanji?: string | undefined
+	kana: string
+	examples: ExampleSentence[]
 	relatedWords: UUIDv4[]
 	relatedKanjis: UUIDv4[]
 	relatedCounters: UUIDv4[]
@@ -21,61 +28,57 @@ export interface SimpleWord extends Word {
 
 export interface Verb extends Word {
 	wordType: WordType.VERB
-	verbType?: VerbType
-	transitivity?: VerbTransitivity
+	verbType?: VerbType | undefined
+	transitivity?: VerbTransitivity | undefined
 }
 
 export interface Adjective extends Word {
 	wordType: WordType.ADJECTIVE
-	adjectiveType?: AdjectiveType
+	adjectiveType?: AdjectiveType | undefined
 }
 
-export interface Kanji {
-	id: UUIDv4
+export interface Kanji extends VocabularyItem {
+	itemType: VocabularyItemType.KANJI
 	kanji: string
 	onyomi: string[]
 	kunyomi: string[]
 	nanori: string[]
-	meanings: Meaning[]
-	jlptLevel?: JLPTLevel
-	difficulty: Difficulty
-	lastStudiedAt?: Date
-	tags: string[]
 	relatedWords: UUIDv4[]
 	relatedKanjis: UUIDv4[]
-	relatedCounter: UUIDv4[]
+	relatedCounters: UUIDv4[]
 }
 
-export interface Counter {
-	id: UUIDv4
-	writing: string
+export interface Counter extends VocabularyItem {
+	itemType: VocabularyItemType.COUNTER
+	counter: string
 	variants: CounterVariants
-	meanings: Meaning[]
-	jlptLevel?: JLPTLevel
-	difficulty: Difficulty
-	lastStudiedAt?: Date
 	examples: ExampleSentence[]
-	tags: string[]
 	relatedWords: UUIDv4[]
 	relatedKanjis: UUIDv4[]
 	relatedCounters: UUIDv4[]
 }
 
 export interface CounterVariants {
-	1: string
-	2: string
-	3: string
-	4: string
-	5: string
-	6: string
-	7: string
-	8: string
-	9: string
-	10: string
-	11: string
+	1?: string | undefined
+	2?: string | undefined
+	3?: string | undefined
+	4?: string | undefined
+	5?: string | undefined
+	6?: string | undefined
+	7?: string | undefined
+	8?: string | undefined
+	9?: string | undefined
+	10?: string | undefined
+	11?: string | undefined
 }
 
 export type UUIDv4 = `${string}-${string}-${string}-${string}-${string}`
+
+export enum VocabularyItemType {
+	WORD = "WORD",
+	KANJI = "KANJI",
+	COUNTER = "COUNTER",
+}
 
 export enum WordType {
 	SIMPLE = "SIMPLE",
@@ -118,7 +121,7 @@ export enum AdjectiveType {
 
 export interface Meaning {
 	meaning: string
-	note?: string
+	note?: string | undefined
 }
 
 export interface ExampleSentence {
