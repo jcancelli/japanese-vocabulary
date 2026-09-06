@@ -1,39 +1,33 @@
 export interface Word {
 	id: UUIDv4
 	wordType: WordType
-	jlptLevel: JLPTLevel
+	jlptLevel?: JLPTLevel
 	difficulty: Difficulty
 	kanji?: string
 	kana: string
-	meanings: WordMeaning[]
+	meanings: Meaning[]
 	examples: ExampleSentence[]
 	tags: string[]
 	relatedWords: UUIDv4[]
 	relatedKanjis: UUIDv4[]
-	lastStudiedAt: Date
+	relatedCounters: UUIDv4[]
+	lastStudiedAt?: Date
 }
 
-export interface Noun extends Word {
-	wordType: WordType.NOUN
+export interface SimpleWord extends Word {
+	wordType: WordType.SIMPLE
+	wordSubtypes: SimpleWordType[]
 }
 
 export interface Verb extends Word {
 	wordType: WordType.VERB
-	verbType: VerbType
-	transitivity: VerbTransitivity
-}
-
-export interface Adverb extends Word {
-	wordType: WordType.ADVERB
+	verbType?: VerbType
+	transitivity?: VerbTransitivity
 }
 
 export interface Adjective extends Word {
 	wordType: WordType.ADJECTIVE
-	adjectiveType: AdjectiveType
-}
-
-export interface PreNounAdjectival extends Word {
-	wordType: WordType.PRE_NOUN_ADJECTIVAL
+	adjectiveType?: AdjectiveType
 }
 
 export interface Kanji {
@@ -42,22 +36,55 @@ export interface Kanji {
 	onyomi: string[]
 	kunyomi: string[]
 	nanori: string[]
-	meanings: KanjiMeaning[]
-	jlptLevel: JLPTLevel
+	meanings: Meaning[]
+	jlptLevel?: JLPTLevel
 	difficulty: Difficulty
-	lastStudiedAt: Date
+	lastStudiedAt?: Date
 	tags: string[]
 	relatedWords: UUIDv4[]
 	relatedKanjis: UUIDv4[]
+	relatedCounter: UUIDv4[]
+}
+
+export interface Counter {
+	id: UUIDv4
+	writing: string
+	pronounciations: CounterVariants
+	meanings: Meaning[]
+	jlptLevel?: JLPTLevel
+	difficulty: Difficulty
+	lastStudiedAt?: Date
+	tags: string[]
+	relatedWords: UUIDv4[]
+	relatedKanjis: UUIDv4[]
+	relatedCounters: UUIDv4[]
+}
+
+export interface CounterVariants {
+	1: string
+	2: string
+	3: string
+	4: string
+	5: string
+	6: string
+	7: string
+	8: string
+	9: string
+	10: string
+	11: string
 }
 
 export type UUIDv4 = `${string}-${string}-${string}-${string}-${string}`
 
 export enum WordType {
-	NOUN = "NOUN",
+	SIMPLE = "SIMPLE",
 	VERB = "VERB",
-	ADVERB = "ADVERB",
 	ADJECTIVE = "ADJECTIVE",
+}
+
+export enum SimpleWordType {
+	NOUN = "NOUN",
+	ADVERB = "ADVERB",
 	PRE_NOUN_ADJECTIVAL = "PRE_NOUN_ADJECTIVAL",
 }
 
@@ -69,13 +96,7 @@ export enum JLPTLevel {
 	N1 = 1,
 }
 
-export enum Difficulty {
-	UNFORGETTABLE = 1,
-	KNOW = 2,
-	KINDA_KNOW = 3,
-	KINDA_DONT_KNOW = 4,
-	DONT_KNOW = 5,
-}
+export type Difficulty = 1 | 2 | 3 | 4 | 5
 
 export enum VerbType {
 	GODAN = "GODAN",
@@ -94,12 +115,7 @@ export enum AdjectiveType {
 	NA = "NA",
 }
 
-export interface WordMeaning {
-	meaning: string
-	note?: string
-}
-
-export interface KanjiMeaning {
+export interface Meaning {
 	meaning: string
 	note?: string
 }
