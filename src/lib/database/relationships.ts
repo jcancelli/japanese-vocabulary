@@ -1,8 +1,9 @@
 import type { KanjiDTO, WordDTO } from "$lib/dto.svelte"
-import { VocabularyItemType, type UUIDv4, type VocabularyItem } from "$lib/model"
-import { db } from "./database"
+import { VocabularyItemType, type UUIDv4 } from "$lib/model"
+import { db, WORD_TABLES, KANJI_TABLES, COUNTER_TABLES } from "./database"
 import { getKanjis } from "./kanjis"
 import { getWords } from "./words"
+import { getCounters } from "./counters"
 
 export async function getRelatedWordsIdsForVocabularyItem(itemId: UUIDv4): Promise<UUIDv4[]> {
 	return await db.itemRelationships
@@ -31,65 +32,80 @@ export async function getRelatedCountersIdsForVocabularyItem(itemId: UUIDv4): Pr
 		.then((results) => results.map(({ relatedId }) => relatedId))
 }
 
-export async function getRelatedVocabularyItemsIdsForVocabularyItem(
-	itemId: UUIDv4,
-): Promise<UUIDv4[]> {
-	return await db.itemRelationships
-		.where("itemId")
-		.equals(itemId)
-		.toArray()
-		.then((results) => results.map(({ relatedId }) => relatedId))
+export async function getRelatedVocabularyItemsIdsForVocabularyItem(itemId: UUIDv4): Promise<{
+	relatedWords: UUIDv4[]
+	relatedKanjis: UUIDv4[]
+	relatedCounters: UUIDv4[]
+}> {
+	return await db.transaction("r", ["itemRelationships"], async () => {
+		const [relatedWords, relatedKanjis, relatedCounters] = await Promise.all([
+			getRelatedWordsIdsForVocabularyItem(itemId),
+			getRelatedKanjisIdsForVocabularyItem(itemId),
+			getRelatedCountersIdsForVocabularyItem(itemId),
+		])
+		return {
+			relatedWords,
+			relatedKanjis,
+			relatedCounters,
+		}
+	})
 }
 
 export async function getRelatedWordsForVocabularyItem(itemId: UUIDv4): Promise<WordDTO[]> {
-	const wordsIds = await getRelatedWordsIdsForVocabularyItem(itemId)
-	return await getWords(wordsIds)
+	return await db.transaction("r", WORD_TABLES, async () => {
+		const wordsIds = await getRelatedWordsIdsForVocabularyItem(itemId)
+		return await getWords(wordsIds)
+	})
 }
 
 export async function getRelatedKanjisForVocabularyItem(itemId: UUIDv4): Promise<KanjiDTO[]> {
-	const kanjisIds = await getRelatedKanjisIdsForVocabularyItem(itemId)
-	return await getKanjis(kanjisIds)
+	return await db.transaction("r", KANJI_TABLES, async () => {
+		const kanjisIds = await getRelatedKanjisIdsForVocabularyItem(itemId)
+		return await getKanjis(kanjisIds)
+	})
 }
 
 export async function getRelatedCountersForVocabularyItem(itemId: UUIDv4): Promise<WordDTO[]> {
-	const countersIds = await getRelatedCountersIdsForVocabularyItem(itemId)
-	return await getCounters(countersIds)
+	return await db.transaction("r", COUNTER_TABLES, async () => {
+		const countersIds = await getRelatedCountersIdsForVocabularyItem(itemId)
+		return await getCounters(countersIds)
+	})
 }
 
-export async function getRelatedVocabularyItemsForVocabularyItem(
-	itemId: UUIDv4,
-): Promise<WordDTO[]> {
-	const itemsIds = await getRelatedVocabularyItemsIdsForVocabularyItem(itemId)
-	return await getVocabularyItems(itemsIds)
-}
-
-export async function updateVocabularyItemRelationships(item: VocabularyItem): Promise<void> {
+export async function updateVocabularyItemRelationships(item: {
+	id: UUIDv4
+	relatedWords: UUIDv4[]
+	relatedKanjis: UUIDv4[]
+	relatedCounters: UUIDv4[]
+}): Promise<void> {
 	await db.transaction("rw", ["itemRelationships"], async () => {
+		const { relatedWords, relatedKanjis, relatedCounters } =
+			await getRelatedVocabularyItemsIdsForVocabularyItem(item.id)
 		// Related words
-		await updateVocabularyItemRelationshipsByRelatedType(
+		await _updateVocabularyItemRelationshipsByRelatedType(
 			item.id,
 			VocabularyItemType.WORD,
-			await getRelatedWordsIdsForVocabularyItem(item.id),
+			relatedWords,
 			item.relatedWords,
 		)
 		// Related kanjis
-		await updateVocabularyItemRelationshipsByRelatedType(
+		await _updateVocabularyItemRelationshipsByRelatedType(
 			item.id,
 			VocabularyItemType.KANJI,
-			await getRelatedKanjisIdsForVocabularyItem(item.id),
+			relatedKanjis,
 			item.relatedKanjis,
 		)
 		// Related counters
-		await updateVocabularyItemRelationshipsByRelatedType(
+		await _updateVocabularyItemRelationshipsByRelatedType(
 			item.id,
 			VocabularyItemType.COUNTER,
-			await getRelatedCountersIdsForVocabularyItem(item.id),
+			relatedCounters,
 			item.relatedCounters,
 		)
 	})
 }
 
-async function updateVocabularyItemRelationshipsByRelatedType(
+async function _updateVocabularyItemRelationshipsByRelatedType(
 	itemId: UUIDv4,
 	relatedType: VocabularyItemType,
 	oldRelatedIds: UUIDv4[],
