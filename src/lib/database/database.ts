@@ -114,13 +114,16 @@ db.version(1).stores({
 	itemRelationships: "++, itemId, relatedId, relatedType",
 })
 
-export const VOCABULARY_ITEM_TABLES = [
-	"items",
-	"words",
-	"simpleWords",
-	"verbs",
-	"adjectives",
-	"kanjis",
-	"counters",
-	"itemRelationships",
+export const BASE_ITEM_TABLES = ["items", "itemRelationships"] as const
+export const BASE_WORD_TABLES = ["words", "simpleWords", "verbs", "adjectives"] as const
+export const BASE_KANJI_TABLES = ["kanjis"] as const
+export const BASE_COUNTER_TABLES = ["counters"] as const
+export const ITEM_TABLES = [
+	...BASE_ITEM_TABLES,
+	...BASE_WORD_TABLES,
+	...BASE_KANJI_TABLES,
+	...BASE_COUNTER_TABLES,
 ] as const
+export const WORD_TABLES = [...BASE_ITEM_TABLES, ...BASE_WORD_TABLES] as const
+export const KANJI_TABLES = [...BASE_ITEM_TABLES, ...BASE_KANJI_TABLES] as const
+export const COUNTER_TABLES = [...BASE_ITEM_TABLES, ...BASE_COUNTER_TABLES] as const
