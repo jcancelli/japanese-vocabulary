@@ -1,83 +1,127 @@
-// TODO: move db operations into transactions
-
-import type { KanjiDTO } from "$lib/dto.svelte"
-import { stripId, type Kanji, type UUIDv4 } from "$lib/model"
-import { db, type KanjiData } from "./database"
-import { mapKanjiDataToKanjiDTO, mapKanjiToKanjiData } from "./mappings"
+import { KanjiDTO } from "$lib/dto.svelte"
 import {
-	getRelatedKanjiIdsForKanji,
-	getRelatedWordIdsForKanji,
-	updateKanjiRelationshipsForKanji,
-	updateWordRelationshipsForKanji,
-} from "./relationships"
+	assertItemIsKanji,
+	ItemType,
+	stripId,
+	type Item,
+	type Kanji,
+	type UUIDv4,
+} from "$lib/model"
+import { db, KANJI_TABLES, type KanjiData } from "./database"
+import {
+	_createItemInternal,
+	_deleteItemInternal,
+	_getItemDataInternal,
+	_getItemDataWithRelationshipsInternal,
+	_getItemsDataWithRelationshipsByItemTypeInternal,
+	_getItemsDataWithRelationshipsInternal,
+	_updateItemInternal,
+	type ItemDataWithRelationships,
+} from "./items"
 
-export async function getKanji(kanjiId: UUIDv4): Promise<KanjiDTO> {
-	return await db.kanjis.get(kanjiId).then(async (kanji) => {
-		if (!kanji) {
-			throw new Error(`Kanji ${kanjiId} does not exist`)
-		}
-		return await joinKanjiData(kanji)
+export async function getKanji(id: UUIDv4): Promise<KanjiDTO> {
+	return await db.transaction("r", KANJI_TABLES, async () => {
+		const itemData = await _getItemDataWithRelationshipsInternal(id)
+		return _joinKanjiDataInternal(itemData)
 	})
 }
 
-export async function getKanjis(kanjiIds: UUIDv4[]): Promise<KanjiDTO[]> {
-	return await db.kanjis.bulkGet(kanjiIds).then(async (kanji) => {
-		if (kanji.includes(undefined)) {
-			const missingKanjiIds = kanji
-				.map((_, index) => (!kanji ? kanjiIds[index] : null))
-				.filter((it) => it !== null)
-			throw new Error(`Unable to find kanji(s) with id(s): ${missingKanjiIds.join(", ")}`)
-		}
-		return await Promise.all((kanji as KanjiData[]).map(joinKanjiData))
+export async function getKanjis(ids: UUIDv4[]): Promise<KanjiDTO[]> {
+	return await db.transaction("r", KANJI_TABLES, async () => {
+		const itemsData = await _getItemsDataWithRelationshipsInternal(ids)
+		return await Promise.all(itemsData.map(_joinKanjiDataInternal))
 	})
 }
 
 export async function getAllKanjis(): Promise<KanjiDTO[]> {
-	return await db.kanjis
-		.toArray()
-		.then(async (kanjis) => await Promise.all(kanjis.map(joinKanjiData)))
-}
-
-async function joinKanjiData(kanji: KanjiData): Promise<KanjiDTO> {
-	const [relatedWords, relatedKanjis] = await Promise.all([
-		getRelatedWordIdsForKanji(kanji.id),
-		getRelatedKanjiIdsForKanji(kanji.id),
-	])
-	return mapKanjiDataToKanjiDTO(kanji, relatedKanjis, relatedWords)
+	return await db.transaction("r", KANJI_TABLES, async () => {
+		const itemsData = await _getItemsDataWithRelationshipsByItemTypeInternal(ItemType.KANJI)
+		return await Promise.all(itemsData.map(_joinKanjiDataInternal))
+	})
 }
 
 export async function createKanji(kanji: Kanji): Promise<void> {
-	const [kanjiData, kanjiRelationships, wordRelationships] = mapKanjiToKanjiData(kanji)
-	await Promise.all([
-		db.kanjis.add(kanjiData, kanjiData.id),
-		db.relatedKanjis.bulkAdd(kanjiRelationships),
-		db.relatedWordsKanjis.bulkAdd(wordRelationships),
-	])
-}
-
-export async function deleteKanji(kanjiId: UUIDv4): Promise<void> {
-	await Promise.all([
-		// Delete kanji data
-		db.kanjis.delete(kanjiId),
-		// Delete kanji relationships
-		db.relatedKanjis.where("kanjiId").equals(kanjiId).or("relatedId").equals(kanjiId).delete(),
-		// Delete word relationships
-		db.relatedWordsKanjis.where("kanjiId").equals(kanjiId).delete(),
-	])
+	await db.transaction("rw", KANJI_TABLES, async () => {
+		await _createItemInternal(kanji)
+		await _createKanjiInternal(kanji)
+	})
 }
 
 export async function updateKanji(kanji: Kanji): Promise<void> {
-	const [kanjiData] = mapKanjiToKanjiData(kanji)
-
-	await Promise.all([
-		db.kanjis.update(kanji.id, stripId(kanjiData)),
-		updateWordRelationshipsForKanji(kanji),
-		updateKanjiRelationshipsForKanji(kanji),
-	])
+	await db.transaction("rw", KANJI_TABLES, async () => {
+		await _updateItemInternal(kanji)
+		await _updateKanjiInternal(kanji)
+	})
 }
 
-export async function getAllKanjiTags(): Promise<string[]> {
-	const kanjis = await db.kanjis.toArray()
-	const tags = new Set(kanjis.flatMap((kanji) => kanji.tags))
-	return Array.from(tags)
+export async function deleteKanji(id: UUIDv4): Promise<void> {
+	await db.transaction("rw", KANJI_TABLES, async () => {
+		const item = await _getItemDataInternal(id)
+		if (item.itemType !== ItemType.KANJI) {
+			throw new Error(`Cannot delete kanji ${id}. Not a kanji.`)
+		}
+		await _deleteItemInternal(id)
+		await _deleteKanjiInternal(id)
+	})
+}
+
+export function mapKanjiToData(kanji: Kanji): KanjiData {
+	return {
+		id: kanji.id,
+		kanji: kanji.kanji,
+		onyomi: Array.from(kanji.onyomi),
+		kunyomi: Array.from(kanji.kunyomi),
+		nanori: Array.from(kanji.nanori),
+	}
+}
+
+export async function _createKanjiInternal(item: Item): Promise<void> {
+	await db.transaction("rw", KANJI_TABLES, async (tx) => {
+		assertItemIsKanji(item)
+		const kanjiData = mapKanjiToData(item)
+		await tx.kanjis.add(kanjiData, kanjiData.id)
+	})
+}
+
+export async function _updateKanjiInternal(item: Item): Promise<void> {
+	await db.transaction("rw", KANJI_TABLES, async (tx) => {
+		assertItemIsKanji(item)
+		const kanjiData = mapKanjiToData(item)
+		await tx.kanjis.update(kanjiData.id, stripId(kanjiData))
+	})
+}
+
+export async function _deleteKanjiInternal(id: UUIDv4): Promise<void> {
+	await db.transaction("rw", KANJI_TABLES, async (tx) => {
+		await tx.kanjis.delete(id)
+	})
+}
+
+export async function _joinKanjiDataInternal(item: ItemDataWithRelationships): Promise<KanjiDTO> {
+	return await db.transaction("r", KANJI_TABLES, async () => {
+		const kanji = await _getKanjiDataInternal(item.id)
+		return new KanjiDTO(
+			item.id,
+			kanji.kanji,
+			kanji.onyomi,
+			kanji.kunyomi,
+			kanji.nanori,
+			item.meanings,
+			item.jlptLevel,
+			item.difficulty,
+			item.lastStudiedAt,
+			item.tags,
+			item.relatedWords,
+			item.relatedKanjis,
+			item.relatedCounters,
+		)
+	})
+}
+
+async function _getKanjiDataInternal(id: UUIDv4): Promise<KanjiData> {
+	const kanjiData = await db.kanjis.get(id)
+	if (!kanjiData) {
+		throw new Error(`Kanji ${id} does not exist`)
+	}
+	return kanjiData
 }
