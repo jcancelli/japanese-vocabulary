@@ -94,10 +94,7 @@ export async function updateItem(item: Item): Promise<void> {
 
 export async function deleteItem(itemId: UUIDv4): Promise<void> {
 	await db.transaction("rw", ITEM_TABLES, async (tx) => {
-		const item = await tx.items.get(itemId)
-		if (!item) {
-			throw new Error(`Cannot find item to delete, id ${itemId}`)
-		}
+		const item = await _getItemDataInternal(itemId)
 
 		await _deleteItemInternal(itemId)
 
@@ -172,14 +169,19 @@ export async function _deleteItemInternal(itemId: UUIDv4): Promise<void> {
 
 export type ItemDataWithRelationships = ItemData & WithRelationships
 
+export async function _getItemDataInternal(itemId: UUIDv4): Promise<ItemData> {
+	const itemData = await db.items.get(itemId)
+	if (!itemData) {
+		throw new Error(`Vocabulary item ${itemId} does not exist`)
+	}
+	return itemData
+}
+
 export async function _getItemDataWithRelationshipsInternal(
 	itemId: UUIDv4,
 ): Promise<ItemDataWithRelationships> {
-	return await db.transaction("r", BASE_ITEM_TABLES, async (tx) => {
-		const itemData = await tx.items.get(itemId)
-		if (!itemData) {
-			throw new Error(`Vocabulary item ${itemId} does not exist`)
-		}
+	return await db.transaction("r", BASE_ITEM_TABLES, async () => {
+		const itemData = await _getItemDataInternal(itemId)
 		const relationships = await getRelatedItemsIdsItem(itemId)
 		return { ...itemData, ...relationships }
 	})
