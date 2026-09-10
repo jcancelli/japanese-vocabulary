@@ -1,47 +1,53 @@
 import type { KanjiDTO, WordDTO } from "$lib/dto.svelte"
-import { VocabularyItemType, type UUIDv4 } from "$lib/model"
-import { db, WORD_TABLES, KANJI_TABLES, COUNTER_TABLES } from "./database"
+import { ItemType, type UUIDv4, type Item, type WithRelationships } from "$lib/model"
+import {
+	db,
+	WORD_TABLES,
+	KANJI_TABLES,
+	COUNTER_TABLES,
+	type ItemRelationshipData,
+} from "./database"
 import { getKanjis } from "./kanjis"
 import { getWords } from "./words"
 import { getCounters } from "./counters"
 
-export async function getRelatedWordsIdsForVocabularyItem(itemId: UUIDv4): Promise<UUIDv4[]> {
+export async function getRelatedWordsIdsForItem(itemId: UUIDv4): Promise<UUIDv4[]> {
 	return await db.itemRelationships
 		.where("itemId")
 		.equals(itemId)
-		.and(({ relatedType }) => relatedType === VocabularyItemType.WORD)
+		.and(({ relatedType }) => relatedType === ItemType.WORD)
 		.toArray()
 		.then((results) => results.map(({ relatedId }) => relatedId))
 }
 
-export async function getRelatedKanjisIdsForVocabularyItem(itemId: UUIDv4): Promise<UUIDv4[]> {
+export async function getRelatedKanjisIdsForItem(itemId: UUIDv4): Promise<UUIDv4[]> {
 	return await db.itemRelationships
 		.where("itemId")
 		.equals(itemId)
-		.and(({ relatedType }) => relatedType === VocabularyItemType.KANJI)
+		.and(({ relatedType }) => relatedType === ItemType.KANJI)
 		.toArray()
 		.then((results) => results.map(({ relatedId }) => relatedId))
 }
 
-export async function getRelatedCountersIdsForVocabularyItem(itemId: UUIDv4): Promise<UUIDv4[]> {
+export async function getRelatedCountersIdsForItem(itemId: UUIDv4): Promise<UUIDv4[]> {
 	return await db.itemRelationships
 		.where("itemId")
 		.equals(itemId)
-		.and(({ relatedType }) => relatedType === VocabularyItemType.COUNTER)
+		.and(({ relatedType }) => relatedType === ItemType.COUNTER)
 		.toArray()
 		.then((results) => results.map(({ relatedId }) => relatedId))
 }
 
-export async function getRelatedVocabularyItemsIdsForVocabularyItem(itemId: UUIDv4): Promise<{
+export async function getRelatedItemsIdsItem(itemId: UUIDv4): Promise<{
 	relatedWords: UUIDv4[]
 	relatedKanjis: UUIDv4[]
 	relatedCounters: UUIDv4[]
 }> {
 	return await db.transaction("r", ["itemRelationships"], async () => {
 		const [relatedWords, relatedKanjis, relatedCounters] = await Promise.all([
-			getRelatedWordsIdsForVocabularyItem(itemId),
-			getRelatedKanjisIdsForVocabularyItem(itemId),
-			getRelatedCountersIdsForVocabularyItem(itemId),
+			getRelatedWordsIdsForItem(itemId),
+			getRelatedKanjisIdsForItem(itemId),
+			getRelatedCountersIdsForItem(itemId),
 		])
 		return {
 			relatedWords,
@@ -51,63 +57,109 @@ export async function getRelatedVocabularyItemsIdsForVocabularyItem(itemId: UUID
 	})
 }
 
-export async function getRelatedWordsForVocabularyItem(itemId: UUIDv4): Promise<WordDTO[]> {
+export async function getRelatedWordsForItem(itemId: UUIDv4): Promise<WordDTO[]> {
 	return await db.transaction("r", WORD_TABLES, async () => {
-		const wordsIds = await getRelatedWordsIdsForVocabularyItem(itemId)
+		const wordsIds = await getRelatedWordsIdsForItem(itemId)
 		return await getWords(wordsIds)
 	})
 }
 
-export async function getRelatedKanjisForVocabularyItem(itemId: UUIDv4): Promise<KanjiDTO[]> {
+export async function getRelatedKanjisForItem(itemId: UUIDv4): Promise<KanjiDTO[]> {
 	return await db.transaction("r", KANJI_TABLES, async () => {
-		const kanjisIds = await getRelatedKanjisIdsForVocabularyItem(itemId)
+		const kanjisIds = await getRelatedKanjisIdsForItem(itemId)
 		return await getKanjis(kanjisIds)
 	})
 }
 
-export async function getRelatedCountersForVocabularyItem(itemId: UUIDv4): Promise<WordDTO[]> {
+export async function getRelatedCountersForItem(itemId: UUIDv4): Promise<WordDTO[]> {
 	return await db.transaction("r", COUNTER_TABLES, async () => {
-		const countersIds = await getRelatedCountersIdsForVocabularyItem(itemId)
+		const countersIds = await getRelatedCountersIdsForItem(itemId)
 		return await getCounters(countersIds)
 	})
 }
 
-export async function updateVocabularyItemRelationships(item: {
-	id: UUIDv4
-	relatedWords: UUIDv4[]
-	relatedKanjis: UUIDv4[]
-	relatedCounters: UUIDv4[]
-}): Promise<void> {
+export async function updateItemRelationships(item: WithRelationships): Promise<void> {
 	await db.transaction("rw", ["itemRelationships"], async () => {
-		const { relatedWords, relatedKanjis, relatedCounters } =
-			await getRelatedVocabularyItemsIdsForVocabularyItem(item.id)
+		const { relatedWords, relatedKanjis, relatedCounters } = await getRelatedItemsIdsItem(
+			item.id,
+		)
 		// Related words
 		await _updateVocabularyItemRelationshipsByRelatedType(
 			item.id,
-			VocabularyItemType.WORD,
+			ItemType.WORD,
 			relatedWords,
 			item.relatedWords,
 		)
 		// Related kanjis
 		await _updateVocabularyItemRelationshipsByRelatedType(
 			item.id,
-			VocabularyItemType.KANJI,
+			ItemType.KANJI,
 			relatedKanjis,
 			item.relatedKanjis,
 		)
 		// Related counters
 		await _updateVocabularyItemRelationshipsByRelatedType(
 			item.id,
-			VocabularyItemType.COUNTER,
+			ItemType.COUNTER,
 			relatedCounters,
 			item.relatedCounters,
 		)
 	})
 }
 
+export function mapItemToItemRelationships(item: Item): ItemRelationshipData[] {
+	const wordsRelationships: ItemRelationshipData[] = item.relatedWords.flatMap((relatedId) => [
+		{ itemId: item.id, relatedId, relatedType: ItemType.WORD },
+		{ itemId: relatedId, relatedId: item.id, relatedType: item.itemType },
+	])
+	const kanjisRelationships: ItemRelationshipData[] = item.relatedKanjis.flatMap((relatedId) => [
+		{ itemId: item.id, relatedId, relatedType: ItemType.KANJI },
+		{ itemId: relatedId, relatedId: item.id, relatedType: item.itemType },
+	])
+	const countersRelationships: ItemRelationshipData[] = item.relatedCounters.flatMap(
+		(relatedId) => [
+			{ itemId: item.id, relatedId, relatedType: ItemType.COUNTER },
+			{ itemId: relatedId, relatedId: item.id, relatedType: item.itemType },
+		],
+	)
+	const relationshipsData = wordsRelationships
+		.concat(kanjisRelationships)
+		.concat(countersRelationships)
+	return relationshipsData
+}
+
+/** Input is assumed to be only relationships with the same itemId */
+export function mapItemRelationshipsDataToIds(relationshipsData: ItemRelationshipData[]): {
+	relatedWords: UUIDv4[]
+	relatedKanjis: UUIDv4[]
+	relatedCounters: UUIDv4[]
+} {
+	const relatedWords: UUIDv4[] = []
+	const relatedKanjis: UUIDv4[] = []
+	const relatedCounters: UUIDv4[] = []
+	for (const { relatedId, relatedType } of relationshipsData) {
+		switch (relatedType) {
+			case ItemType.WORD:
+				relatedWords.push(relatedId)
+				break
+			case ItemType.KANJI:
+				relatedKanjis.push(relatedId)
+				break
+			case ItemType.COUNTER:
+				relatedCounters.push(relatedId)
+				break
+			default:
+				throw new Error(
+					`Item relationship with unexpected relatedType found: ${relatedType}`,
+				)
+		}
+	}
+	return { relatedWords, relatedKanjis, relatedCounters }
+}
+
 async function _updateVocabularyItemRelationshipsByRelatedType(
 	itemId: UUIDv4,
-	relatedType: VocabularyItemType,
+	relatedType: ItemType,
 	oldRelatedIds: UUIDv4[],
 	newRelatedIds: UUIDv4[],
 ): Promise<void> {
