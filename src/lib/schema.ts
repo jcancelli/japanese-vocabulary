@@ -4,7 +4,7 @@ import {
 	JLPTLevel,
 	SimpleWordType,
 	VerbType,
-	VocabularyItemType,
+	ItemType,
 	WordType,
 	type UUIDv4,
 } from "./model"
@@ -16,7 +16,7 @@ export const UUIDv4Schema = z.custom<UUIDv4>((value) => {
 }, "Invalid UUIDv4")
 export const UUIDv4SetSchema = z.array(UUIDv4Schema).refine(isSetLikeArray, "Duplicate id")
 
-export const VocabularyItemTypeSchema = z.enum(VocabularyItemType, "Invalid vocabulary item type")
+export const ItemTypeSchema = z.enum(ItemType, "Invalid vocabulary item type")
 export const WordTypeSchema = z.enum(WordType, "Invalid word type")
 export const SimpleWordTypeSchema = z.enum(SimpleWordType, "Invalid simple word type")
 export const VerbTypeSchema = z.enum(VerbType, "Invalid verb type")
@@ -76,9 +76,9 @@ export const CounterVariantsSchema = z.object({
 	11: KanaStringSchema.optional(),
 })
 
-export const VocabularyItemSchema = z.object({
+export const ItemSchema = z.object({
 	id: UUIDv4Schema,
-	itemType: VocabularyItemTypeSchema,
+	itemType: ItemTypeSchema,
 	meanings: MeaningsSchema,
 	jlptLevel: JLPTLevelSchema.optional(),
 	difficulty: DifficultySchema,
@@ -88,8 +88,8 @@ export const VocabularyItemSchema = z.object({
 	relatedKanjis: UUIDv4SetSchema,
 	relatedCounters: UUIDv4SetSchema,
 })
-export const WordSchema = VocabularyItemSchema.extend({
-	itemType: z.literal(VocabularyItemType.WORD),
+export const WordSchema = ItemSchema.extend({
+	itemType: z.literal(ItemType.WORD),
 	wordType: WordTypeSchema,
 	kanji: KanjiStringSchema.nonempty("Empty field").optional(),
 	kana: KanaStringSchema.nonempty("Empty field"),
@@ -108,14 +108,14 @@ export const AdjectiveSchema = WordSchema.extend({
 	wordType: z.literal(WordType.ADJECTIVE),
 	adjectiveType: AdjectiveTypeSchema.optional(),
 })
-export const KanjiSchema = VocabularyItemSchema.extend({
-	itemType: z.literal(VocabularyItemType.KANJI),
+export const KanjiSchema = ItemSchema.extend({
+	itemType: z.literal(ItemType.KANJI),
 	kanji: KanjiStringSchema.nonempty("Empty field"),
 	onyomi: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate on'yomi"),
 	kunyomi: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate kun'yomi"),
 	nanori: z.array(KanaStringSchema).refine(isSetLikeArray, "Duplicate naori"),
 })
-export const CounterSchema = VocabularyItemSchema.extend({
+export const CounterSchema = ItemSchema.extend({
 	counter: KanaStringSchema.nonempty("Empty field"),
 	variants: CounterVariantsSchema,
 	examples: z.array(ExampleSentenceSchema),

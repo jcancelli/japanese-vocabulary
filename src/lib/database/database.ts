@@ -6,14 +6,14 @@ import type {
 	VerbType,
 	VerbTransitivity,
 	AdjectiveType,
-	VocabularyItemType,
+	ItemType,
 	SimpleWordType,
 } from "$lib/model"
 import Dexie, { type EntityTable } from "dexie"
 
-export interface VocabularyItemData {
+export interface ItemData {
 	id: UUIDv4
-	itemType: VocabularyItemType
+	itemType: ItemType
 	meanings: MeaningData[]
 	jlptLevel?: JLPTLevel | undefined
 	difficulty: Difficulty
@@ -87,11 +87,11 @@ export interface CounterVariantsData {
 export interface ItemRelationshipData {
 	itemId: UUIDv4
 	relatedId: UUIDv4
-	relatedType: VocabularyItemType
+	relatedType: ItemType
 }
 
 export type Database = Dexie & {
-	items: EntityTable<VocabularyItemData, "id">
+	items: EntityTable<ItemData, "id">
 	words: EntityTable<WordData, "id">
 	simpleWords: EntityTable<SimpleWordData, "id">
 	verbs: EntityTable<VerbData, "id">

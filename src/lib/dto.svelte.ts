@@ -1,6 +1,6 @@
 import {
 	JLPTLevel,
-	VocabularyItemType,
+	ItemType,
 	WordType,
 	SimpleWordType,
 	VerbType,
@@ -17,10 +17,10 @@ import {
 	type ExampleSentence,
 	type Counter,
 	type CounterVariants,
-	type VocabularyItem,
+	type Item,
 } from "./model"
 
-export abstract class VocabularyItemDTO implements VocabularyItem {
+export abstract class ItemDTO implements Item {
 	id: UUIDv4
 	meanings: MeaningDTO[]
 	jlptLevel: JLPTLevel | undefined
@@ -55,7 +55,7 @@ export abstract class VocabularyItemDTO implements VocabularyItem {
 		this.relatedCounters = $state(Array.from(relatedCounters))
 	}
 
-	abstract get itemType(): VocabularyItemType
+	abstract get itemType(): ItemType
 	abstract get primaryWriting(): string
 
 	get primaryMeaning(): Readonly<MeaningDTO> {
@@ -63,7 +63,7 @@ export abstract class VocabularyItemDTO implements VocabularyItem {
 	}
 }
 
-export abstract class WordDTO extends VocabularyItemDTO implements Word {
+export abstract class WordDTO extends ItemDTO implements Word {
 	kanji: string | undefined
 	kana: string
 	examples: ExampleSentenceDTO[]
@@ -98,8 +98,8 @@ export abstract class WordDTO extends VocabularyItemDTO implements Word {
 		this.examples = $state(Array.from(examples).map(ExampleSentenceDTO.fromInterface))
 	}
 
-	get itemType(): VocabularyItemType.WORD {
-		return VocabularyItemType.WORD
+	get itemType(): ItemType.WORD {
+		return ItemType.WORD
 	}
 
 	get primaryWriting(): string {
@@ -311,7 +311,7 @@ export class AdjectiveDTO extends WordDTO implements Adjective {
 	}
 }
 
-export class KanjiDTO extends VocabularyItemDTO implements Kanji {
+export class KanjiDTO extends ItemDTO implements Kanji {
 	kanji: string
 	onyomi: string[]
 	kunyomi: string[]
@@ -367,8 +367,8 @@ export class KanjiDTO extends VocabularyItemDTO implements Kanji {
 		)
 	}
 
-	get itemType(): VocabularyItemType.KANJI {
-		return VocabularyItemType.KANJI
+	get itemType(): ItemType.KANJI {
+		return ItemType.KANJI
 	}
 
 	get primaryWriting(): string {
@@ -380,7 +380,7 @@ export class KanjiDTO extends VocabularyItemDTO implements Kanji {
 	}
 }
 
-export class CounterDTO extends VocabularyItemDTO implements Counter {
+export class CounterDTO extends ItemDTO implements Counter {
 	counter: string
 	variants: CounterVariantsDTO
 	examples: ExampleSentenceDTO[]
@@ -415,8 +415,8 @@ export class CounterDTO extends VocabularyItemDTO implements Counter {
 		this.examples = $state(Array.from(examples).map(ExampleSentenceDTO.fromInterface))
 	}
 
-	get itemType(): VocabularyItemType.COUNTER {
-		return VocabularyItemType.COUNTER
+	get itemType(): ItemType.COUNTER {
+		return ItemType.COUNTER
 	}
 
 	get primaryWriting(): string {
