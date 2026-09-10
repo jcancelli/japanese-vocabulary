@@ -1,11 +1,14 @@
-export interface WithRelationships {
+export interface WithId {
 	id: UUIDv4
+}
+
+export interface WithRelationships {
 	relatedWords: UUIDv4[]
 	relatedKanjis: UUIDv4[]
 	relatedCounters: UUIDv4[]
 }
 
-export interface Item extends WithRelationships {
+export interface Item extends WithId, WithRelationships {
 	itemType: ItemType
 	readonly primaryWriting: string
 	readonly primaryMeaning: Readonly<Meaning>
