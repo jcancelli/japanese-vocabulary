@@ -1,6 +1,12 @@
-export interface VocabularyItem {
+export interface WithRelationships {
 	id: UUIDv4
-	itemType: VocabularyItemType
+	relatedWords: UUIDv4[]
+	relatedKanjis: UUIDv4[]
+	relatedCounters: UUIDv4[]
+}
+
+export interface Item extends WithRelationships {
+	itemType: ItemType
 	readonly primaryWriting: string
 	readonly primaryMeaning: Readonly<Meaning>
 	meanings: Meaning[]
@@ -8,13 +14,10 @@ export interface VocabularyItem {
 	difficulty: Difficulty
 	lastStudiedAt?: Date | undefined
 	tags: string[]
-	relatedWords: UUIDv4[]
-	relatedKanjis: UUIDv4[]
-	relatedCounters: UUIDv4[]
 }
 
-export interface Word extends VocabularyItem {
-	itemType: VocabularyItemType.WORD
+export interface Word extends Item {
+	itemType: ItemType.WORD
 	wordType: WordType
 	kanji?: string | undefined
 	kana: string
@@ -37,16 +40,16 @@ export interface Adjective extends Word {
 	adjectiveType?: AdjectiveType | undefined
 }
 
-export interface Kanji extends VocabularyItem {
-	itemType: VocabularyItemType.KANJI
+export interface Kanji extends Item {
+	itemType: ItemType.KANJI
 	kanji: string
 	onyomi: string[]
 	kunyomi: string[]
 	nanori: string[]
 }
 
-export interface Counter extends VocabularyItem {
-	itemType: VocabularyItemType.COUNTER
+export interface Counter extends Item {
+	itemType: ItemType.COUNTER
 	counter: string
 	variants: CounterVariants
 	examples: ExampleSentence[]
@@ -68,7 +71,7 @@ export interface CounterVariants {
 
 export type UUIDv4 = `${string}-${string}-${string}-${string}-${string}`
 
-export enum VocabularyItemType {
+export enum ItemType {
 	WORD = "WORD",
 	KANJI = "KANJI",
 	COUNTER = "COUNTER",
@@ -129,14 +132,72 @@ export function stripId<ID, T extends { id: ID }>(object: T): Omit<T, "id"> {
 	return copy
 }
 
+export function isItem(it: any): it is Item {
+	return !!it && typeof it === "object" && "itemType" in it && typeof it.itemType === "string"
+}
+
 export function isWord(it: any): it is Word {
-	return !!it && typeof it === "object" && "wordType" in it && typeof it.wordType === "string"
+	return isItem(it) && itemIsWord(it)
+}
+
+export function itemIsWord(item: Item): item is Word {
+	return item.itemType === ItemType.WORD
 }
 
 export function isKanji(it: any): it is Kanji {
-	return !!it && typeof it === "object" && "nanori" in it && Array.isArray(it.nanori)
+	return isItem(it) && itemIsKanji(it)
+}
+
+export function itemIsKanji(item: Item): item is Kanji {
+	return item.itemType === ItemType.KANJI
 }
 
 export function isCounter(it: any): it is Counter {
-	return !!it && typeof it === "object" && "counter" in it && typeof it.counter === "string"
+	return isItem(it) && itemIsCounter(it)
+}
+
+export function itemIsCounter(item: Item): item is Counter {
+	return item.itemType === ItemType.COUNTER
+}
+
+export function assertIsItem(it: any): asserts it is Item {
+	if (!isItem(it)) {
+		throw new Error("Not an item")
+	}
+}
+
+export function assertIsWord(it: any): asserts it is Word {
+	if (!isWord(it)) {
+		throw new Error("Not a word")
+	}
+}
+
+export function assertItemIsWord(item: Item): asserts item is Word {
+	if (!itemIsWord(item)) {
+		throw new Error("Not a word")
+	}
+}
+
+export function assertIsKanji(it: any): asserts it is Kanji {
+	if (!isKanji(it)) {
+		throw new Error("Not a kanji")
+	}
+}
+
+export function assertItemIsKanji(item: Item): asserts item is Kanji {
+	if (!itemIsKanji(item)) {
+		throw new Error("Not a kanji")
+	}
+}
+
+export function assertIsCounter(it: any): asserts it is Counter {
+	if (!isCounter(it)) {
+		throw new Error("Not a counter")
+	}
+}
+
+export function assertItemIsCounter(item: Item): asserts item is Counter {
+	if (!itemIsCounter(item)) {
+		throw new Error("Not a counter")
+	}
 }
