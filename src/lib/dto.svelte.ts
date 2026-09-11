@@ -439,7 +439,7 @@ export class CounterDTO extends ItemDTO implements Counter {
 	}
 
 	get primaryWriting(): string {
-		return this.counter
+		return `~${this.counter}`
 	}
 
 	get primaryMeaning(): Readonly<MeaningDTO> {
