@@ -61,34 +61,13 @@ export async function importDb({ version, data }: SerializedDB): Promise<void> {
 	}
 	await db.transaction("rw", ALL_TABLES, async (tx) => {
 		await Promise.all([
-			tx.items.bulkPut(
-				data.items,
-				data.items.map((item) => item.id),
-			),
-			tx.words.bulkPut(
-				data.words,
-				data.words.map((word) => word.id),
-			),
-			tx.simpleWords.bulkPut(
-				data.simpleWords,
-				data.simpleWords.map((simpleWord) => simpleWord.id),
-			),
-			tx.verbs.bulkPut(
-				data.verbs,
-				data.verbs.map((verb) => verb.id),
-			),
-			tx.adjectives.bulkPut(
-				data.adjectives,
-				data.adjectives.map((adjective) => adjective.id),
-			),
-			tx.kanjis.bulkPut(
-				data.kanjis,
-				data.kanjis.map((kanji) => kanji.id),
-			),
-			tx.counters.bulkPut(
-				data.counters,
-				data.counters.map((counter) => counter.id),
-			),
+			tx.items.bulkPut(data.items),
+			tx.words.bulkPut(data.words),
+			tx.simpleWords.bulkPut(data.simpleWords),
+			tx.verbs.bulkPut(data.verbs),
+			tx.adjectives.bulkPut(data.adjectives),
+			tx.kanjis.bulkPut(data.kanjis),
+			tx.counters.bulkPut(data.counters),
 			tx.itemRelationships.bulkPut(data.itemRelationships), // FIXME: gotta avoid duplicates
 		])
 	})
