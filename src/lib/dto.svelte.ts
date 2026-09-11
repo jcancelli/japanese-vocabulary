@@ -57,6 +57,7 @@ export abstract class ItemDTO implements Item {
 
 	abstract get itemType(): ItemType
 	abstract get primaryWriting(): string
+	abstract get searchStrings(): ReadonlyArray<string>
 
 	get primaryMeaning(): Readonly<MeaningDTO> {
 		return this.meanings[0]
@@ -104,6 +105,15 @@ export abstract class WordDTO extends ItemDTO implements Word {
 
 	get primaryWriting(): string {
 		return this.kanji ?? this.kana
+	}
+
+	get searchStrings(): ReadonlyArray<string> {
+		const strings: string[] = [this.kana]
+		if (this.kanji) {
+			strings.push(this.kanji)
+		}
+		strings.push(...this.meanings.map((meaning) => meaning.meaning))
+		return strings
 	}
 
 	abstract get wordType(): WordType
@@ -378,6 +388,15 @@ export class KanjiDTO extends ItemDTO implements Kanji {
 	get primaryMeaning(): Readonly<MeaningDTO> {
 		return this.meanings[0]
 	}
+
+	get searchStrings(): ReadonlyArray<string> {
+		const strings: string[] = [this.kanji]
+		strings.push(...this.onyomi)
+		strings.push(...this.kunyomi)
+		strings.push(...this.nanori)
+		strings.push(...this.meanings.map((meaning) => meaning.meaning))
+		return strings
+	}
 }
 
 export class CounterDTO extends ItemDTO implements Counter {
@@ -427,6 +446,13 @@ export class CounterDTO extends ItemDTO implements Counter {
 		return this.meanings[0]
 	}
 
+	get searchStrings(): ReadonlyArray<string> {
+		const strings: string[] = [this.counter]
+		strings.push(...this.variants)
+		strings.push(...this.meanings.map((meaning) => meaning.meaning))
+		return strings
+	}
+
 	copy(): CounterDTO {
 		return new CounterDTO(
 			this.id,
@@ -445,7 +471,7 @@ export class CounterDTO extends ItemDTO implements Counter {
 	}
 }
 
-export class CounterVariantsDTO implements CounterVariants {
+export class CounterVariantsDTO implements CounterVariants, Iterable<string> {
 	1: string | undefined
 	2: string | undefined
 	3: string | undefined
@@ -478,6 +504,16 @@ export class CounterVariantsDTO implements CounterVariants {
 
 	copy(): CounterVariantsDTO {
 		return new CounterVariantsDTO(this)
+	}
+
+	*[Symbol.iterator]() {
+		for (let i = 0; i <= 11; i++) {
+			const variant = this[i as keyof this] as string
+			if (variant === undefined) {
+				continue
+			}
+			yield variant
+		}
 	}
 }
 

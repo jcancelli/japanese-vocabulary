@@ -12,6 +12,7 @@ export interface Item extends WithId, WithRelationships {
 	itemType: ItemType
 	readonly primaryWriting: string
 	readonly primaryMeaning: Readonly<Meaning>
+	readonly searchStrings: ReadonlyArray<string>
 	meanings: Meaning[]
 	jlptLevel?: JLPTLevel | undefined
 	difficulty: Difficulty
