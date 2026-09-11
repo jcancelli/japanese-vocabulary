@@ -127,3 +127,9 @@ export const ITEM_TABLES = [
 export const WORD_TABLES = [...BASE_ITEM_TABLES, ...BASE_WORD_TABLES] as const
 export const KANJI_TABLES = [...BASE_ITEM_TABLES, ...BASE_KANJI_TABLES] as const
 export const COUNTER_TABLES = [...BASE_ITEM_TABLES, ...BASE_COUNTER_TABLES] as const
+export const ALL_TABLES = [
+	...BASE_ITEM_TABLES,
+	...BASE_WORD_TABLES,
+	...BASE_KANJI_TABLES,
+	...BASE_COUNTER_TABLES,
+] as const

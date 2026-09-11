@@ -14,5 +14,4 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
 - "rarity" field, to sort words by most common to uncommon (better study the most common first)
 - dark mode
 - error pages (also differentiate between 404 and 500 for pages that load data)
-- export/import database
 - text-to-speech for japanese pronounciation

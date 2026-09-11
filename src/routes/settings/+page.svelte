@@ -1,22 +1,52 @@
-<script>
+<script lang="ts">
 	import Button from "flowbite-svelte/Button.svelte"
 	import HomeIcon from "flowbite-svelte-icons/HomeSolid.svelte"
 	import Labeled from "$lib/components/Labeled.svelte"
 	import { resolve } from "$app/paths"
-	import Modal from "flowbite-svelte/Modal.svelte"
 	import { db } from "$lib/database/database"
+	import { exportDb, importDb, type SerializedDB } from "$lib/database/serialization"
+	import { download } from "$lib/util"
 
-	let showNukeDbModal = $state(false)
-	let showNukeLocalStorageModal = $state(false)
-
-	async function nukeDb() {
+	async function tryNukeDb() {
+		if (!window.confirm("Do you really want to delete all database data?")) {
+			return
+		}
 		await db.delete()
-		showNukeDbModal = false
 	}
 
-	function nukeLocalStorage() {
+	function tryNukeLocalStorage() {
+		if (window.confirm("Do you really want to delete all local storage data?")) {
+			return
+		}
 		localStorage.clear()
-		showNukeLocalStorageModal = false
+	}
+
+	async function tryExportDb() {
+		let filename = window.prompt("File name")
+		if (!filename || filename.trim().length === 0) {
+			return
+		}
+		filename = filename.trim()
+		if (filename.endsWith(".json")) {
+			filename = filename.slice(0, filename.length - ".json".length)
+		}
+
+		const serializedDb = await exportDb()
+		const json = JSON.stringify(serializedDb, null, "    ")
+		download(`${filename}.json`, json)
+	}
+
+	let dbImportFiles: FileList | null = $state(null)
+
+	async function tryImportDb() {
+		if (!dbImportFiles || dbImportFiles.length !== 1) {
+			throw new Error()
+		}
+		const file = dbImportFiles[0]
+		const json = await file.text()
+		const data = JSON.parse(json) as SerializedDB
+		await importDb(data)
+		dbImportFiles = null
 	}
 </script>
 
@@ -37,66 +67,50 @@
 <main class="flex flex-col gap-6 p-6">
 	<!-- Database -->
 	<Labeled label="Database">
-		<!-- Nuke db button -->
-		<Button
-			color="red"
-			onclick={() => (showNukeDbModal = true)}
-		>
-			Nuke
-		</Button>
+		<div class="flex flex-row flex-wrap gap-3">
+			<!-- Import db -->
+			<div class="">
+				<!-- Import db file input -->
+				<input
+					type="file"
+					bind:files={dbImportFiles}
+					multiple={false}
+					accept="application/json"
+				/>
+				<!-- Import db button -->
+				<Button
+					color="secondary"
+					onclick={tryImportDb}
+					class="mx-auto block"
+					disabled={!dbImportFiles}
+				>
+					Import
+				</Button>
+			</div>
+			<!-- Export db button -->
+			<Button
+				color="secondary"
+				onclick={tryExportDb}
+			>
+				Export
+			</Button>
+			<!-- Nuke db button -->
+			<Button
+				color="red"
+				onclick={tryNukeDb}
+			>
+				Nuke
+			</Button>
+		</div>
 	</Labeled>
 	<!-- Local storage -->
 	<Labeled label="Local storage">
 		<!-- Nuke local storage button -->
 		<Button
 			color="red"
-			onclick={() => (showNukeLocalStorageModal = true)}
+			onclick={tryNukeLocalStorage}
 		>
 			Nuke
 		</Button>
 	</Labeled>
 </main>
-
-<!-- Nuke database modal -->
-<Modal
-	title="Confirm database deletion"
-	bind:open={showNukeDbModal}
->
-	Are you sure you want to delete all the data stored in the database?
-	{#snippet footer()}
-		<Button
-			color="red"
-			onclick={nukeDb}
-		>
-			Yup
-		</Button>
-		<Button
-			color="gray"
-			onclick={() => (showNukeDbModal = false)}
-		>
-			Nope
-		</Button>
-	{/snippet}
-</Modal>
-
-<!-- Nuke local storage modal -->
-<Modal
-	title="Confirm local storage deletion"
-	bind:open={showNukeLocalStorageModal}
->
-	Are you sure you want to delete all data stored in local storage?
-	{#snippet footer()}
-		<Button
-			color="red"
-			onclick={nukeLocalStorage}
-		>
-			Yup
-		</Button>
-		<Button
-			color="gray"
-			onclick={() => (showNukeLocalStorageModal = false)}
-		>
-			Nope
-		</Button>
-	{/snippet}
-</Modal>
