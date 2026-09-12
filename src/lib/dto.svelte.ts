@@ -513,7 +513,7 @@ export class CounterVariantsDTO
 	}
 
 	*[Symbol.iterator]() {
-		for (let n = 0; n <= 11; n++) {
+		for (let n = 1; n <= 11; n++) {
 			const hiragana = this[n as keyof this] as string | undefined
 			yield { n, hiragana }
 		}
