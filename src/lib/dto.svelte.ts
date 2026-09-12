@@ -448,7 +448,11 @@ export class CounterDTO extends ItemDTO implements Counter {
 
 	get searchStrings(): ReadonlyArray<string> {
 		const strings: string[] = [this.counter]
-		strings.push(...this.variants)
+		strings.push(
+			...Array.from(this.variants)
+				.map((it) => it.hiragana)
+				.filter((it) => it !== undefined),
+		)
 		strings.push(...this.meanings.map((meaning) => meaning.meaning))
 		return strings
 	}
@@ -471,7 +475,9 @@ export class CounterDTO extends ItemDTO implements Counter {
 	}
 }
 
-export class CounterVariantsDTO implements CounterVariants, Iterable<string> {
+export class CounterVariantsDTO
+	implements CounterVariants, Iterable<{ n: number; hiragana: string | undefined }>
+{
 	1: string | undefined
 	2: string | undefined
 	3: string | undefined
@@ -507,12 +513,9 @@ export class CounterVariantsDTO implements CounterVariants, Iterable<string> {
 	}
 
 	*[Symbol.iterator]() {
-		for (let i = 0; i <= 11; i++) {
-			const variant = this[i as keyof this] as string
-			if (variant === undefined) {
-				continue
-			}
-			yield variant
+		for (let n = 0; n <= 11; n++) {
+			const hiragana = this[n as keyof this] as string | undefined
+			yield { n, hiragana }
 		}
 	}
 }
