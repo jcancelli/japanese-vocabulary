@@ -16,7 +16,7 @@ export const ITEM_TYPE_PRETTY_STRING = {
 } as const
 
 export const WORD_TYPE_PRETTY_STRING = {
-	[WordType.SIMPLE]: "Simple word",
+	[WordType.SIMPLE]: "Word",
 	[WordType.VERB]: "Verb",
 	[WordType.ADJECTIVE]: "Adjective",
 } as const
