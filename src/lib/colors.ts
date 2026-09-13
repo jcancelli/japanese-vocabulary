@@ -1,11 +1,21 @@
-import { JLPTLevel, Difficulty, WordType } from "./model"
+import { JLPTLevel, WordType, ItemType, SimpleWordType } from "./model"
+
+export const ITEM_TYPE_COLOR = {
+	[ItemType.WORD]: "#de7567",
+	[ItemType.KANJI]: "#6fd668",
+	[ItemType.COUNTER]: "#8db2ff",
+} as const
 
 export const WORD_TYPE_COLOR = {
-	[WordType.NOUN]: "#d791e6",
+	[WordType.SIMPLE]: "#8757a1",
 	[WordType.VERB]: "#dbbd68",
-	[WordType.ADVERB]: "#7eb9dc",
 	[WordType.ADJECTIVE]: "#8dc584",
-	[WordType.PRE_NOUN_ADJECTIVAL]: "#e48d86",
+} as const
+
+export const WORD_SUBTYPE_COLOR = {
+	[SimpleWordType.NOUN]: "#d791e6",
+	[SimpleWordType.ADVERB]: "#7eb9dc",
+	[SimpleWordType.PRE_NOUN_ADJECTIVAL]: "#e48d86",
 } as const
 
 export const JLPT_LEVEL_COLOR = {
@@ -17,9 +27,9 @@ export const JLPT_LEVEL_COLOR = {
 } as const
 
 export const DIFFICULTY_COLOR = {
-	[Difficulty.DONT_KNOW]: "#ff0000",
-	[Difficulty.KINDA_DONT_KNOW]: "#ffb500",
-	[Difficulty.KINDA_KNOW]: "#ffff00",
-	[Difficulty.KNOW]: "#b5ff00",
-	[Difficulty.UNFORGETTABLE]: "#00ff00",
+	[5]: "#ff0000",
+	[4]: "#ffb500",
+	[3]: "#ffff00",
+	[2]: "#b5ff00",
+	[1]: "#00ff00",
 } as const
