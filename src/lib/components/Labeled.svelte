@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from "svelte"
-	import Label from "flowbite-svelte/Label.svelte"
 
 	export interface LabeledEntryProps {
 		label?: string
@@ -13,9 +12,9 @@
 
 <div {...props}>
 	{#if label}
-		<Label class="mb-2 text-lg font-bold">
+		<h4 class="font-semibold">
 			{label}
-		</Label>
+		</h4>
 	{/if}
 	{@render children?.()}
 </div>
