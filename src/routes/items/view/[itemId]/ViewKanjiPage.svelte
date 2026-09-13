@@ -1,12 +1,13 @@
 <script lang="ts">
-	import Button from "flowbite-svelte/Button.svelte"
-	import { resolve } from "$app/paths"
-	import EditIcon from "flowbite-svelte-icons/PenSolid.svelte"
-	import Labeled from "$lib/components/Labeled.svelte"
-	import { JLPT_LEVEL_COLOR } from "$lib/colors"
-	import { JLPT_LEVEL_PRETTY_STRING } from "$lib/strings"
 	import type { CounterDTO, KanjiDTO, WordDTO } from "$lib/dto.svelte"
-	import ItemPage from "../../ItemPage.svelte"
+	import KanjiFragment from "$lib/components/items/views/kanji/KanjiFragment.svelte"
+	import PronounciationsFragment from "$lib/components/items/views/kanji/PronounciationsFragment.svelte"
+	import MeaningsFragment from "$lib/components/items/views/MeaningsFragment.svelte"
+	import JLPTLevelFragment from "$lib/components/items/views/JLPTLevelFragment.svelte"
+	import DifficultyFragment from "$lib/components/items/views/DifficultyFragment.svelte"
+	import RelatedItemsFragment from "$lib/components/items/views/RelatedItemsFragment.svelte"
+	import TagsFragment from "$lib/components/items/views/TagsFragment.svelte"
+	import ViewItemPage from "./ViewItemPage.svelte"
 
 	export interface KanjiPageProps {
 		kanji: KanjiDTO
@@ -19,129 +20,51 @@
 	const { onyomi, kunyomi, nanori, meanings, jlptLevel, difficulty, tags } = $derived(kanji)
 </script>
 
-<ItemPage item={kanji}>
+<ViewItemPage item={kanji}>
 	<!-- Kanji -->
-	<h2 class="mt-10 mb-7 text-center text-8xl font-bold">
-		{kanji.kanji}
-	</h2>
+	<KanjiFragment
+		kanji={kanji.kanji}
+		class="mt-10 mb-7"
+	/>
 	<!-- Pronounciations -->
 	<div class="grid grid-cols-3 text-center">
-		<Labeled label="On'yomi">
-			{#if onyomi.length > 0}
-				<p>{onyomi.join(", ")}</p>
-			{:else}
-				<p class="text-neutral-400">-</p>
-			{/if}
-		</Labeled>
-		<Labeled label="Kun'yomi">
-			{#if kunyomi.length > 0}
-				<p>{kunyomi.join(", ")}</p>
-			{:else}
-				<p class="text-neutral-400">-</p>
-			{/if}
-		</Labeled>
-		<Labeled label="Nanori">
-			{#if nanori.length > 0}
-				<p>{nanori.join(", ")}</p>
-			{:else}
-				<p class="text-neutral-400">-</p>
-			{/if}
-		</Labeled>
+		<PronounciationsFragment
+			label="On'yomi"
+			pronounciations={onyomi}
+		/>
+		<PronounciationsFragment
+			label="Kun'yomi"
+			pronounciations={kunyomi}
+		/>
+		<PronounciationsFragment
+			label="Nanori"
+			pronounciations={nanori}
+		/>
 	</div>
-	<div class="grid w-full grid-cols-3">
-		<!-- Meanings -->
-		<Labeled
-			label="Meanings"
-			class="text-center"
-		>
-			{#if meanings.length > 0}
-				<p>
-					{meanings
-						.map(({ meaning, note }) => (note ? `${meaning} (${note})` : meaning))
-						.join(", ")}
-				</p>
-			{:else}
-				<p class="text-neutral-400">-</p>
-			{/if}
-		</Labeled>
-		<!-- JLPT level -->
-		<Labeled
-			label="JLPT Level"
-			class="text-center"
-		>
-			{#if jlptLevel}
-				<p style:color={JLPT_LEVEL_COLOR[jlptLevel]}>
-					{JLPT_LEVEL_PRETTY_STRING[jlptLevel]}
-				</p>
-			{:else}
-				<p class="text-neutral-400">-</p>
-			{/if}
-		</Labeled>
-		<!-- Difficulty -->
-		<Labeled
-			label="Difficulty"
-			class="text-center"
-		>
-			<p>{difficulty}/5</p>
-		</Labeled>
+	<!-- Meanings, JLPT level and difficulty -->
+	<div class="grid grid-cols-3">
+		<MeaningsFragment {meanings} />
+		<JLPTLevelFragment {jlptLevel} />
+		<DifficultyFragment {difficulty} />
 	</div>
 	<!-- Related words -->
-	<Labeled label="Related words">
-		{#each relatedWords as relatedWord}
-			<a
-				href={resolve("/items/view/[itemId]", { itemId: relatedWord.id })}
-				class="block cursor-pointer py-1 hover:underline"
-			>
-				{relatedWord.primaryWriting}
-				({relatedWord.primaryMeaning.meaning.toLowerCase()})
-			</a>
-		{:else}
-			<p class="text-center text-neutral-400">No related words</p>
-		{/each}
-	</Labeled>
+	<RelatedItemsFragment
+		relatedItems={relatedWords}
+		label="Related words"
+		noEntryPlaceholder="No related words"
+	/>
 	<!-- Related kanjis -->
-	<Labeled label="Related kanjis">
-		{#each relatedKanjis as relatedKanji}
-			<a
-				href={resolve("/items/view/[itemId]", { itemId: relatedKanji.id })}
-				class="block cursor-pointer py-1 hover:underline"
-			>
-				{relatedKanji.kanji}
-				({relatedKanji.primaryMeaning.meaning.toLowerCase()})
-			</a>
-		{:else}
-			<p class="text-center text-neutral-400">No related kanjis</p>
-		{/each}
-	</Labeled>
+	<RelatedItemsFragment
+		relatedItems={relatedKanjis}
+		label="Related kanjis"
+		noEntryPlaceholder="No related kanjis"
+	/>
 	<!-- Related counters -->
-	<Labeled label="Related counters">
-		{#each relatedCounters as relatedCounter}
-			<a
-				href={resolve("/items/view/[itemId]", { itemId: relatedCounter.id })}
-				class="block cursor-pointer py-1 hover:underline"
-			>
-				{relatedCounter.primaryWriting}
-				({relatedCounter.primaryMeaning.meaning.toLowerCase()})
-			</a>
-		{:else}
-			<p class="text-center text-neutral-400">No related counters</p>
-		{/each}
-	</Labeled>
+	<RelatedItemsFragment
+		relatedItems={relatedCounters}
+		label="Related counters"
+		noEntryPlaceholder="No related counters"
+	/>
 	<!-- Tags -->
-	<Labeled label="Tags">
-		{#if tags.length > 0}
-			<p>{tags.join(", ")}</p>
-		{:else}
-			<p class="text-center text-neutral-400">No tags</p>
-		{/if}
-	</Labeled>
-	<!-- Buttons -->
-	{#snippet buttons()}
-		<Button
-			color="secondary"
-			href={resolve("/items/edit/[itemId]", { itemId: kanji.id })}
-		>
-			<EditIcon /> Edit
-		</Button>
-	{/snippet}
-</ItemPage>
+	<TagsFragment {tags} />
+</ViewItemPage>

@@ -1,12 +1,14 @@
 <script lang="ts">
-	import { resolve } from "$app/paths"
-	import { JLPT_LEVEL_COLOR } from "$lib/colors"
-	import Labeled from "$lib/components/Labeled.svelte"
 	import type { CounterDTO, KanjiDTO, SimpleWordDTO, WordDTO } from "$lib/dto.svelte"
-	import { JLPT_LEVEL_PRETTY_STRING, WORD_SUBTYPE_PRETTY_STRING } from "$lib/strings"
-	import ItemPage from "../../ItemPage.svelte"
-	import Button from "flowbite-svelte/Button.svelte"
-	import EditIcon from "flowbite-svelte-icons/PenSolid.svelte"
+	import ViewItemPage from "./ViewItemPage.svelte"
+	import KanjiKanaFragment from "$lib/components/items/views/word/KanjiKanaFragment.svelte"
+	import MeaningsFragment from "$lib/components/items/views/MeaningsFragment.svelte"
+	import JLPTLevelFragment from "$lib/components/items/views/JLPTLevelFragment.svelte"
+	import DifficultyFragment from "$lib/components/items/views/DifficultyFragment.svelte"
+	import ExampleSentencesFragment from "$lib/components/items/views/ExampleSentencesFragment.svelte"
+	import RelatedItemsFragment from "$lib/components/items/views/RelatedItemsFragment.svelte"
+	import TagsFragment from "$lib/components/items/views/TagsFragment.svelte"
+	import WordSubtypesFragment from "$lib/components/items/views/word/WordSubtypesFragment.svelte"
 
 	export interface ViewSimpleWordPageProps {
 		simpleWord: SimpleWordDTO
@@ -21,138 +23,41 @@
 		$derived(simpleWord)
 </script>
 
-<ItemPage item={simpleWord}>
+<ViewItemPage item={simpleWord}>
 	<!-- Kanji/kana -->
-	<div class="mt-10 mb-4 text-center">
-		{#if kanji}
-			<h2 class="text-5xl font-bold">
-				{kanji}
-			</h2>
-			<h3 class="text-md mt-2 font-semibold">
-				{kana}
-			</h3>
-		{:else}
-			<h2 class="text-5xl font-bold">
-				{kana}
-			</h2>
-		{/if}
-	</div>
+	<KanjiKanaFragment
+		{kanji}
+		{kana}
+		class="mt-10 mb-4"
+	/>
+	<!-- Meanings, JLPT level and difficulty -->
 	<div class="grid w-full grid-cols-3">
-		<!-- Meanings -->
-		<Labeled
-			label="Meanings"
-			class="text-center"
-		>
-			{#if meanings.length > 0}
-				<p>
-					{meanings
-						.map(({ meaning, note }) => (note ? `${meaning} (${note})` : meaning))
-						.join(", ")}
-				</p>
-			{:else}
-				<p class="text-neutral-400">-</p>
-			{/if}
-		</Labeled>
-		<!-- JLPT level -->
-		<Labeled
-			label="JLPT Level"
-			class="text-center"
-		>
-			{#if jlptLevel}
-				<p style:color={JLPT_LEVEL_COLOR[jlptLevel]}>
-					{JLPT_LEVEL_PRETTY_STRING[jlptLevel]}
-				</p>
-			{:else}
-				<p class="text-neutral-400">-</p>
-			{/if}
-		</Labeled>
-		<!-- Difficulty -->
-		<Labeled
-			label="Difficulty"
-			class="text-center"
-		>
-			<p>{difficulty}/5</p>
-		</Labeled>
+		<MeaningsFragment {meanings} />
+		<JLPTLevelFragment {jlptLevel} />
+		<DifficultyFragment {difficulty} />
 	</div>
 	<!-- Word subtypes -->
-	<Labeled
-		label="Word types"
-		class="text-center"
-	>
-		{#if wordSubtypes.length > 0}
-			<p>{wordSubtypes.map((t) => WORD_SUBTYPE_PRETTY_STRING[t]).join(", ")}</p>
-		{:else}
-			<p class="text-neutral-400">-</p>
-		{/if}
-	</Labeled>
+	<WordSubtypesFragment {wordSubtypes} />
 	<!-- Examples -->
-	<Labeled label="Examples">
-		<div class="grid grid-cols-2">
-			{#each examples as { english, japanese }}
-				<p>{japanese}</p>
-				<p>{english}</p>
-			{:else}
-				<p class="col-span-2 text-center text-neutral-400">No examples</p>
-			{/each}
-		</div>
-	</Labeled>
+	<ExampleSentencesFragment {examples} />
 	<!-- Related words -->
-	<Labeled label="Related words">
-		{#each relatedWords as relatedWord}
-			<a
-				href={resolve("/items/view/[itemId]", { itemId: relatedWord.id })}
-				class="block cursor-pointer py-1 hover:underline"
-			>
-				{relatedWord.primaryWriting}
-				({relatedWord.primaryMeaning.meaning.toLowerCase()})
-			</a>
-		{:else}
-			<p class="text-center text-neutral-400">No related words</p>
-		{/each}
-	</Labeled>
+	<RelatedItemsFragment
+		relatedItems={relatedWords}
+		label="Related words"
+		noEntryPlaceholder="No related words"
+	/>
 	<!-- Related kanjis -->
-	<Labeled label="Related kanjis">
-		{#each relatedKanjis as relatedKanji}
-			<a
-				href={resolve("/items/view/[itemId]", { itemId: relatedKanji.id })}
-				class="block cursor-pointer py-1 hover:underline"
-			>
-				{relatedKanji.kanji}
-				({relatedKanji.primaryMeaning.meaning.toLowerCase()})
-			</a>
-		{:else}
-			<p class="text-center text-neutral-400">No related kanjis</p>
-		{/each}
-	</Labeled>
+	<RelatedItemsFragment
+		relatedItems={relatedKanjis}
+		label="Related kanjis"
+		noEntryPlaceholder="No related kanjis"
+	/>
 	<!-- Related counters -->
-	<Labeled label="Related counters">
-		{#each relatedCounters as relatedCounter}
-			<a
-				href={resolve("/items/view/[itemId]", { itemId: relatedCounter.id })}
-				class="block cursor-pointer py-1 hover:underline"
-			>
-				{relatedCounter.primaryWriting}
-				({relatedCounter.primaryMeaning.meaning.toLowerCase()})
-			</a>
-		{:else}
-			<p class="text-center text-neutral-400">No related counters</p>
-		{/each}
-	</Labeled>
+	<RelatedItemsFragment
+		relatedItems={relatedCounters}
+		label="Related counters"
+		noEntryPlaceholder="No related counters"
+	/>
 	<!-- Tags -->
-	<Labeled label="Tags">
-		{#if tags.length > 0}
-			<p>{tags.join(", ")}</p>
-		{:else}
-			<p class="text-center text-neutral-400">No tags</p>
-		{/if}
-	</Labeled>
-	<!-- Buttons -->
-	{#snippet buttons()}
-		<Button
-			color="secondary"
-			href={resolve("/items/edit/[itemId]", { itemId: simpleWord.id })}
-		>
-			<EditIcon /> Edit
-		</Button>
-	{/snippet}
-</ItemPage>
+	<TagsFragment {tags} />
+</ViewItemPage>
