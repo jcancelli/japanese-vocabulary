@@ -58,10 +58,17 @@ export const ExampleSentenceSchema = z.object(
 	"Invalid example sentence",
 )
 
-export const VerbTransitivitySchema = z.object({
-	transitive: z.boolean(),
-	intransitive: z.boolean(),
-})
+export const VerbTransitivitySchema = z
+	.object({
+		transitive: z.boolean(),
+		intransitive: z.boolean(),
+	})
+	.transform((value) => {
+		if (value.transitive || value.intransitive) {
+			return value
+		}
+		return undefined
+	})
 export const CounterVariantsSchema = z.object({
 	1: KanaStringSchema.optional(),
 	2: KanaStringSchema.optional(),
