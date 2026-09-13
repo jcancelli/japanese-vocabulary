@@ -6,7 +6,7 @@
 	import ToggleButton from "./ToggleButton.svelte"
 
 	export interface RadioGroupProps<T> {
-		value: T
+		value?: T | undefined
 		options: Option<T>[]
 		disabled?: boolean
 		class?: string
@@ -18,6 +18,10 @@
 	}
 
 	let { value = $bindable(), options, disabled, ...props }: RadioGroupProps<T> = $props()
+
+	function toggle(option: T) {
+		value = value === option ? undefined : option
+	}
 </script>
 
 <ButtonGroup
@@ -27,7 +31,7 @@
 	{#each options as { value: option, label }}
 		<ToggleButton
 			checked={value === option}
-			onclick={() => (value = option)}
+			onclick={() => toggle(option)}
 			role="radio"
 			{disabled}
 		>
