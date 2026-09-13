@@ -1,4 +1,4 @@
-import { AdjectiveType, ItemType, JLPTLevel, VerbType, WordType } from "./model"
+import { AdjectiveType, ItemType, JLPTLevel, SimpleWordType, VerbType, WordType } from "./model"
 import { StudySessionLanguage } from "./study_session"
 
 export const JLPT_LEVEL_PRETTY_STRING = {
@@ -19,6 +19,12 @@ export const WORD_TYPE_PRETTY_STRING = {
 	[WordType.SIMPLE]: "Simple word",
 	[WordType.VERB]: "Verb",
 	[WordType.ADJECTIVE]: "Adjective",
+} as const
+
+export const WORD_SUBTYPE_PRETTY_STRING = {
+	[SimpleWordType.NOUN]: "Noun",
+	[SimpleWordType.ADVERB]: "Adverb",
+	[SimpleWordType.PRE_NOUN_ADJECTIVAL]: "Pre-noun adjectival",
 } as const
 
 export const VERB_TYPE_PRETTY_STRING = {
