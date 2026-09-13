@@ -70,6 +70,7 @@
 			class="mx-auto mt-4 block"
 			outline
 			onclick={addNewReading}
+			disabled={newEntry.trim().length === 0}
 		>
 			<PlusIcon />
 		</Button>
