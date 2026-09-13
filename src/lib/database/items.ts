@@ -46,6 +46,14 @@ export async function getAllItems(): Promise<ItemDTO[]> {
 	})
 }
 
+export async function getAllItemsOfType(itemType: ItemType): Promise<ItemDTO[]> {
+	return await db.transaction("r", ITEM_TABLES, async () => {
+		const itemsDataWithRelationships =
+			await _getItemsDataWithRelationshipsByItemTypeInternal(itemType)
+		return await Promise.all(itemsDataWithRelationships.map(_joinItemData))
+	})
+}
+
 export async function createItem(item: Item): Promise<void> {
 	await db.transaction("rw", ITEM_TABLES, async () => {
 		await _createItemInternal(item)
