@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { CounterDTO, KanjiDTO, WordDTO } from "$lib/dto.svelte"
 	import KanjiFragment from "$lib/components/items/views/kanji/KanjiFragment.svelte"
-	import PronounciationsFragment from "$lib/components/items/views/kanji/PronounciationsFragment.svelte"
+	import ReadingsFragment from "$lib/components/items/views/kanji/ReadingsFragment.svelte"
 	import MeaningsFragment from "$lib/components/items/views/MeaningsFragment.svelte"
 	import JLPTLevelFragment from "$lib/components/items/views/JLPTLevelFragment.svelte"
 	import DifficultyFragment from "$lib/components/items/views/DifficultyFragment.svelte"
@@ -26,17 +26,17 @@
 		kanji={kanji.kanji}
 		class="mt-10 mb-7"
 	/>
-	<!-- Pronounciations -->
+	<!-- Readings -->
 	<div class="grid grid-cols-3 text-center">
-		<PronounciationsFragment
+		<ReadingsFragment
 			label="On'yomi"
 			pronounciations={onyomi}
 		/>
-		<PronounciationsFragment
+		<ReadingsFragment
 			label="Kun'yomi"
 			pronounciations={kunyomi}
 		/>
-		<PronounciationsFragment
+		<ReadingsFragment
 			label="Nanori"
 			pronounciations={nanori}
 		/>
