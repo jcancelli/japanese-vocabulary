@@ -11,13 +11,10 @@
 <SpeedDialTrigger {...props} />
 <SpeedDial tooltip="none">
 	<Listgroup active>
-		<ListgroupItem href={resolve("/words/new/noun")}>Noun</ListgroupItem>
-		<ListgroupItem href={resolve("/words/new/verb")}>Verb</ListgroupItem>
-		<ListgroupItem href={resolve("/words/new/adverb")}>Adverb</ListgroupItem>
-		<ListgroupItem href={resolve("/words/new/adjective")}>Adjective</ListgroupItem>
-		<ListgroupItem href={resolve("/words/new/pre-noun-adjectival")}>
-			Pre-Noun Adjectival
-		</ListgroupItem>
-		<ListgroupItem href={resolve("/kanjis/new")}>Kanji</ListgroupItem>
+		<ListgroupItem href={resolve("/items/create/simple-word")}>Simple word</ListgroupItem>
+		<ListgroupItem href={resolve("/items/create/verb")}>Verb</ListgroupItem>
+		<ListgroupItem href={resolve("/items/create/adjective")}>Adjective</ListgroupItem>
+		<ListgroupItem href={resolve("/items/create/kanji")}>Kanji</ListgroupItem>
+		<ListgroupItem href={resolve("/items/create/counter")}>Counter</ListgroupItem>
 	</Listgroup>
 </SpeedDial>
