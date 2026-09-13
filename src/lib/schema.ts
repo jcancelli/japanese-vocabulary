@@ -104,7 +104,10 @@ export const WordSchema = ItemSchema.extend({
 })
 export const SimpleWordSchema = WordSchema.extend({
 	wordType: z.literal(WordType.SIMPLE),
-	wordSybtypes: z.array(SimpleWordTypeSchema).nonempty().refine(isSetLikeArray),
+	wordSubtypes: z
+		.array(SimpleWordTypeSchema)
+		.nonempty("At least one subtype is needed")
+		.refine(isSetLikeArray),
 })
 export const VerbSchema = WordSchema.extend({
 	wordType: z.literal(WordType.VERB),
