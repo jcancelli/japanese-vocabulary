@@ -13,7 +13,7 @@
 </script>
 
 {#snippet StarButton(difficulty: Difficulty)}
-	{@const isFilled = value <= difficulty}
+	{@const isFilled = value >= difficulty}
 	<button
 		onclick={() => (value = difficulty)}
 		{disabled}
