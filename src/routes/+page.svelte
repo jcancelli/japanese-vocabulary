@@ -25,12 +25,9 @@
 <main
 	class="grid max-h-screen w-screen grid-cols-2 items-start justify-items-center gap-y-7 overflow-hidden p-5"
 >
-	{@render Card(resolve("/words"), "Words", ListIcon)}
-	{@render Card(resolve("/words/study/configure"), "Study words", StudyIcon)}
-	{@render Card(resolve("/kanjis"), "Kanjis", ListIcon)}
+	{@render Card(resolve("/items/view"), "Items", ListIcon)}
 	{@render Card(resolve("/settings"), "Settings", SettingsIcon)}
 	{#if import.meta.env.DEV}
-		{@render Card(resolve("/kanjis/study/configure"), "Study kanjis", StudyIcon)}
 		{@render Card(resolve("/sandbox"), "Sandbox", SandboxIcon)}
 	{/if}
 </main>
