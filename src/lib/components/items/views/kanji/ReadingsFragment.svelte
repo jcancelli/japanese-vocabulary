@@ -1,13 +1,13 @@
 <script lang="ts">
 	import Labeled from "$lib/components/Labeled.svelte"
 
-	export interface PronounciationsFragmentProps {
+	export interface ReadingsFragmentProps {
 		label: string
 		pronounciations: string[]
 		class?: string | undefined
 	}
 
-	let { label, pronounciations, ...props }: PronounciationsFragmentProps = $props()
+	let { label, pronounciations, ...props }: ReadingsFragmentProps = $props()
 </script>
 
 <Labeled
