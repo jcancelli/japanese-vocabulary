@@ -16,11 +16,10 @@
 	}
 
 	let { kanji, relatedWords, relatedKanjis, relatedCounters }: KanjiPageProps = $props()
-	const { itemType, onyomi, kunyomi, nanori, meanings, jlptLevel, difficulty, tags } =
-		$derived(kanji)
+	const { onyomi, kunyomi, nanori, meanings, jlptLevel, difficulty, tags } = $derived(kanji)
 </script>
 
-<ItemPage {itemType}>
+<ItemPage item={kanji}>
 	<!-- Kanji -->
 	<h2 class="mt-10 mb-7 text-center text-8xl font-bold">
 		{kanji.kanji}

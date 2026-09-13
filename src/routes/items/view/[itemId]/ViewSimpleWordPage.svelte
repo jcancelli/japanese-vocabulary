@@ -17,24 +17,11 @@
 
 	let { simpleWord, relatedWords, relatedKanjis, relatedCounters }: ViewSimpleWordPageProps =
 		$props()
-	const {
-		itemType,
-		wordType,
-		kanji,
-		kana,
-		meanings,
-		jlptLevel,
-		difficulty,
-		tags,
-		examples,
-		wordSubtypes,
-	} = $derived(simpleWord)
+	const { kanji, kana, meanings, jlptLevel, difficulty, tags, examples, wordSubtypes } =
+		$derived(simpleWord)
 </script>
 
-<ItemPage
-	{itemType}
-	{wordType}
->
+<ItemPage item={simpleWord}>
 	<!-- Kanji/kana -->
 	<div class="mt-10 mb-4 text-center">
 		{#if kanji}

@@ -16,25 +16,11 @@
 	}
 
 	let { verb, relatedWords, relatedKanjis, relatedCounters }: ViewVerbPageProps = $props()
-	const {
-		itemType,
-		wordType,
-		kanji,
-		kana,
-		meanings,
-		jlptLevel,
-		difficulty,
-		examples,
-		tags,
-		verbType,
-		transitivity,
-	} = $derived(verb)
+	const { kanji, kana, meanings, jlptLevel, difficulty, examples, tags, verbType, transitivity } =
+		$derived(verb)
 </script>
 
-<ItemPage
-	{itemType}
-	{wordType}
->
+<ItemPage item={verb}>
 	<!-- Kanji/kana -->
 	<div class="mt-10 mb-4 text-center">
 		{#if kanji}

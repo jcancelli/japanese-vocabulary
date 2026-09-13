@@ -17,24 +17,11 @@
 
 	let { adjective, relatedWords, relatedKanjis, relatedCounters }: ViewAdjectivePageProps =
 		$props()
-	const {
-		itemType,
-		wordType,
-		kanji,
-		kana,
-		meanings,
-		jlptLevel,
-		difficulty,
-		examples,
-		tags,
-		adjectiveType,
-	} = $derived(adjective)
+	const { kanji, kana, meanings, jlptLevel, difficulty, examples, tags, adjectiveType } =
+		$derived(adjective)
 </script>
 
-<ItemPage
-	{itemType}
-	{wordType}
->
+<ItemPage item={adjective}>
 	<!-- Kanji/kana -->
 	<div class="mt-10 mb-4 text-center">
 		{#if kanji}

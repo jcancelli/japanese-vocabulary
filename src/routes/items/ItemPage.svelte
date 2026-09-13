@@ -4,37 +4,30 @@
 	import HomeIcon from "flowbite-svelte-icons/HomeSolid.svelte"
 	import ItemListIcon from "flowbite-svelte-icons/AlignCenterOutline.svelte"
 	import Tooltip from "flowbite-svelte/Tooltip.svelte"
-	import { ItemType, WordType } from "$lib/model"
+	import { itemIsWord, type Item } from "$lib/model"
 	import { ITEM_TYPE_COLOR, WORD_TYPE_COLOR } from "$lib/colors"
 	import { ITEM_TYPE_PRETTY_STRING, WORD_TYPE_PRETTY_STRING } from "$lib/strings"
 
 	export interface ItemPageProps {
-		itemType: ItemType
-		wordType?: WordType
+		item: Item
 		children: Snippet
 		buttons?: Snippet
 	}
 
-	let { itemType, wordType, children, buttons }: ItemPageProps = $props()
+	let { item, children, buttons }: ItemPageProps = $props()
 
 	const itemTypeColor = $derived.by(() => {
-		if (itemType === ItemType.WORD) {
-			if (wordType === undefined) {
-				throw new Error()
-			}
-			return WORD_TYPE_COLOR[wordType]
+		if (itemIsWord(item)) {
+			return WORD_TYPE_COLOR[item.wordType]
 		} else {
-			return ITEM_TYPE_COLOR[itemType]
+			return ITEM_TYPE_COLOR[item.itemType]
 		}
 	})
 	const itemTypeString = $derived.by(() => {
-		if (itemType === ItemType.WORD) {
-			if (wordType === undefined) {
-				throw new Error()
-			}
-			return WORD_TYPE_PRETTY_STRING[wordType]
+		if (itemIsWord(item)) {
+			return WORD_TYPE_PRETTY_STRING[item.wordType]
 		} else {
-			return ITEM_TYPE_PRETTY_STRING[itemType]
+			return ITEM_TYPE_PRETTY_STRING[item.itemType]
 		}
 	})
 </script>

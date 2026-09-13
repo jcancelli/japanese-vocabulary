@@ -16,7 +16,7 @@
 	}
 
 	let { counter, relatedWords, relatedKanjis, relatedCounters }: ViewCounterPageProps = $props()
-	const { itemType, variants, meanings, jlptLevel, difficulty, tags } = $derived(counter)
+	const { variants, meanings, jlptLevel, difficulty, tags } = $derived(counter)
 	const NUMBER = {
 		1: "一",
 		2: "二",
@@ -32,7 +32,7 @@
 	} as const
 </script>
 
-<ItemPage {itemType}>
+<ItemPage item={counter}>
 	<!-- Counter -->
 	<h2 class="mt-10 mb-7 text-center text-8xl font-bold">
 		{counter.primaryWriting}
