@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { AdjectiveType } from "$lib/model"
 	import { ADJECTIVE_TYPE_PRETTY_STRING } from "$lib/strings"
-	import RadioGroup, { type Option } from "./RadioGroup.svelte"
+	import RadioGroup, { type Option } from "../RadioGroup.svelte"
 
 	export interface AdjectiveTypeInputProps {
-		value: AdjectiveType
+		value?: AdjectiveType | undefined
 		disabled?: boolean
 		class?: string
 	}

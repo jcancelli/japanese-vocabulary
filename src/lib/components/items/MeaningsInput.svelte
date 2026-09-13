@@ -1,25 +1,21 @@
 <script lang="ts">
-	import type { WordMeaning } from "$lib/model"
 	import FloatingLabelInput from "flowbite-svelte/FloatingLabelInput.svelte"
 	import Helper from "flowbite-svelte/Helper.svelte"
 	import Button from "flowbite-svelte/Button.svelte"
 	import CloseButton from "flowbite-svelte/CloseButton.svelte"
 	import PlusIcon from "flowbite-svelte-icons/PlusOutline.svelte"
-	import { WordMeaningSchema } from "$lib/schema"
-	import { WordMeaningDTO } from "$lib/dto.svelte"
+	import { MeaningDTO } from "$lib/dto.svelte"
+	import { MeaningSchema } from "$lib/schema"
 
 	export interface MeaningsInputProps {
-		value: WordMeaningDTO[]
+		value: MeaningDTO[]
 		disabled?: boolean
 		class?: string
 	}
 
 	let { value = $bindable(), disabled, ...props }: MeaningsInputProps = $props()
 
-	let newEntry: WordMeaning = $state({
-		meaning: "",
-		note: "",
-	})
+	let newEntry: MeaningDTO = $state(new MeaningDTO())
 	let error: {
 		meaning: string | null
 		note: string | null
@@ -31,7 +27,7 @@
 	function addNewMeaning() {
 		clearError()
 
-		const result = WordMeaningSchema.safeParse(newEntry)
+		const result = MeaningSchema.safeParse(newEntry)
 
 		// Handle error
 		if (result.error) {
@@ -48,17 +44,14 @@
 			return
 		}
 
-		value.push(WordMeaningDTO.fromInterface(result.data))
+		value.push(MeaningDTO.fromInterface(result.data))
 
 		clearNewEntry()
 		clearError()
 	}
 
 	function clearNewEntry() {
-		newEntry = {
-			meaning: "",
-			note: "",
-		}
+		newEntry = new MeaningDTO()
 	}
 
 	function clearError() {

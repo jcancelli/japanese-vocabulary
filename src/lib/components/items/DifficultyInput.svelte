@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Difficulty } from "$lib/model"
+	import { type Difficulty } from "$lib/model"
 	import StarOutlineIcon from "flowbite-svelte-icons/StarOutline.svelte"
 	import StarSolidIcon from "flowbite-svelte-icons/StarSolid.svelte"
 
@@ -33,9 +33,9 @@
 {/snippet}
 
 <div class="flex w-fit flex-row flex-nowrap items-center justify-center {props.class ?? ''}">
-	{@render StarButton(Difficulty.DONT_KNOW)}
-	{@render StarButton(Difficulty.KINDA_DONT_KNOW)}
-	{@render StarButton(Difficulty.KINDA_KNOW)}
-	{@render StarButton(Difficulty.KNOW)}
-	{@render StarButton(Difficulty.UNFORGETTABLE)}
+	{@render StarButton(1)}
+	{@render StarButton(2)}
+	{@render StarButton(3)}
+	{@render StarButton(4)}
+	{@render StarButton(5)}
 </div>

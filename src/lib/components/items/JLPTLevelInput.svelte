@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { JLPTLevel } from "$lib/model"
 	import { JLPT_LEVEL_PRETTY_STRING } from "$lib/strings"
-	import RadioGroup, { type Option } from "./RadioGroup.svelte"
+	import RadioGroup, { type Option } from "../RadioGroup.svelte"
 
 	export interface JLPTLevelInputProps {
-		value: JLPTLevel
+		value?: JLPTLevel | undefined
 		disabled?: boolean
 		class?: string
 	}

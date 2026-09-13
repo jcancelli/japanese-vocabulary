@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { VerbType } from "$lib/model"
 	import { VERB_TYPE_PRETTY_STRING } from "$lib/strings"
-	import RadioGroup, { type Option } from "./RadioGroup.svelte"
+	import RadioGroup, { type Option } from "../RadioGroup.svelte"
 
 	export interface VerbTypeInputProps {
-		value: VerbType
+		value?: VerbType | undefined
 		disabled?: boolean
 		class?: string
 	}
