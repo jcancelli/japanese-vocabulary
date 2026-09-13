@@ -94,6 +94,7 @@
 			class="mx-auto mt-4 block"
 			onclick={addNewMeaning}
 			outline
+			disabled={newEntry.meaning.trim().length === 0}
 		>
 			<PlusIcon />
 		</Button>
