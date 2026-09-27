@@ -1,3 +1,4 @@
+import { SvelteMap } from "svelte/reactivity"
 import {
 	JLPTLevel,
 	ItemType,
@@ -401,13 +402,13 @@ export class KanjiDTO extends ItemDTO implements Kanji {
 
 export class CounterDTO extends ItemDTO implements Counter {
 	counter: string
-	variants: CounterVariantsDTO
+	variants: SvelteMap<number, string>
 	examples: ExampleSentenceDTO[]
 
 	constructor(
 		id: UUIDv4 = crypto.randomUUID(),
 		counter: string = "",
-		variants: CounterVariants = {},
+		variants: CounterVariants = new Map(),
 		meanings: Iterable<Meaning> = [],
 		jlptLevel: JLPTLevel | undefined = undefined,
 		difficulty: Difficulty = 1,
@@ -430,7 +431,7 @@ export class CounterDTO extends ItemDTO implements Counter {
 			relatedCounters,
 		)
 		this.counter = $state(counter)
-		this.variants = $state(CounterVariantsDTO.fromInterface(variants))
+		this.variants = $state(new SvelteMap(variants))
 		this.examples = $state(Array.from(examples).map(ExampleSentenceDTO.fromInterface))
 	}
 
@@ -448,11 +449,7 @@ export class CounterDTO extends ItemDTO implements Counter {
 
 	get searchStrings(): ReadonlyArray<string> {
 		const strings: string[] = [this.counter]
-		strings.push(
-			...Array.from(this.variants)
-				.map((it) => it.hiragana)
-				.filter((it) => it !== undefined),
-		)
+		strings.push(...this.variants.values())
 		strings.push(...this.meanings.map((meaning) => meaning.meaning))
 		return strings
 	}
@@ -472,51 +469,6 @@ export class CounterDTO extends ItemDTO implements Counter {
 			this.relatedKanjis,
 			this.relatedCounters,
 		)
-	}
-}
-
-export class CounterVariantsDTO
-	implements CounterVariants, Iterable<{ n: number; hiragana: string | undefined }>
-{
-	1: string | undefined
-	2: string | undefined
-	3: string | undefined
-	4: string | undefined
-	5: string | undefined
-	6: string | undefined
-	7: string | undefined
-	8: string | undefined
-	9: string | undefined
-	10: string | undefined
-	11: string | undefined
-
-	constructor(variants: CounterVariants = {}) {
-		this[1] = $state(variants[1])
-		this[2] = $state(variants[2])
-		this[3] = $state(variants[3])
-		this[4] = $state(variants[4])
-		this[5] = $state(variants[5])
-		this[6] = $state(variants[6])
-		this[7] = $state(variants[7])
-		this[8] = $state(variants[8])
-		this[9] = $state(variants[9])
-		this[10] = $state(variants[10])
-		this[11] = $state(variants[11])
-	}
-
-	static fromInterface(variants: CounterVariants): CounterVariantsDTO {
-		return new CounterVariantsDTO(variants)
-	}
-
-	copy(): CounterVariantsDTO {
-		return new CounterVariantsDTO(this)
-	}
-
-	*[Symbol.iterator]() {
-		for (let n = 1; n <= 11; n++) {
-			const hiragana = this[n as keyof this] as string | undefined
-			yield { n, hiragana }
-		}
 	}
 }
 

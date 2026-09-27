@@ -69,22 +69,7 @@ export function mapCounterToData(counter: Counter): CounterData {
 	return {
 		id: counter.id,
 		counter: counter.counter,
-		variants:
-			counter.variants ?
-				{
-					[1]: counter.variants[1],
-					[2]: counter.variants[2],
-					[3]: counter.variants[3],
-					[4]: counter.variants[4],
-					[5]: counter.variants[5],
-					[6]: counter.variants[6],
-					[7]: counter.variants[7],
-					[8]: counter.variants[8],
-					[9]: counter.variants[9],
-					[10]: counter.variants[10],
-					[11]: counter.variants[11],
-				}
-			:	{},
+		variants: new Map(counter.variants),
 		examples: counter.examples.map(({ japanese, english }) => ({ japanese, english })),
 	}
 }

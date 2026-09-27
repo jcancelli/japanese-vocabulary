@@ -59,19 +59,7 @@ export interface Counter extends Item {
 	examples: ExampleSentence[]
 }
 
-export interface CounterVariants {
-	1?: string | undefined
-	2?: string | undefined
-	3?: string | undefined
-	4?: string | undefined
-	5?: string | undefined
-	6?: string | undefined
-	7?: string | undefined
-	8?: string | undefined
-	9?: string | undefined
-	10?: string | undefined
-	11?: string | undefined
-}
+export type CounterVariants = Map<number, string>
 
 export type UUIDv4 = `${string}-${string}-${string}-${string}-${string}`
 

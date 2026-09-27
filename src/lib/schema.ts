@@ -69,19 +69,7 @@ export const VerbTransitivitySchema = z
 		}
 		return undefined
 	})
-export const CounterVariantsSchema = z.object({
-	1: KanaStringSchema.optional(),
-	2: KanaStringSchema.optional(),
-	3: KanaStringSchema.optional(),
-	4: KanaStringSchema.optional(),
-	5: KanaStringSchema.optional(),
-	6: KanaStringSchema.optional(),
-	7: KanaStringSchema.optional(),
-	8: KanaStringSchema.optional(),
-	9: KanaStringSchema.optional(),
-	10: KanaStringSchema.optional(),
-	11: KanaStringSchema.optional(),
-})
+export const CounterVariantsSchema = z.map(z.int(), KanaStringSchema)
 
 export const ItemSchema = z.object({
 	id: UUIDv4Schema,
