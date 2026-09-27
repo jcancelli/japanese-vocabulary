@@ -1,5 +1,5 @@
-import type { KanjiDTO, WordDTO } from "$lib/dto.svelte"
-import { ItemType, type UUIDv4, type Item, type WithRelationships } from "$lib/model"
+import type { CounterDTO, KanjiDTO, WordDTO } from "$lib/dto.svelte"
+import { ItemType, type UUIDv4, type Item, type WithRelationships, type WithId } from "$lib/model"
 import {
 	db,
 	WORD_TABLES,
@@ -71,14 +71,14 @@ export async function getRelatedKanjisForItem(itemId: UUIDv4): Promise<KanjiDTO[
 	})
 }
 
-export async function getRelatedCountersForItem(itemId: UUIDv4): Promise<WordDTO[]> {
+export async function getRelatedCountersForItem(itemId: UUIDv4): Promise<CounterDTO[]> {
 	return await db.transaction("r", COUNTER_TABLES, async () => {
 		const countersIds = await getRelatedCountersIdsForItem(itemId)
 		return await getCounters(countersIds)
 	})
 }
 
-export async function updateItemRelationships(item: WithRelationships): Promise<void> {
+export async function updateItemRelationships(item: WithId & WithRelationships): Promise<void> {
 	await db.transaction("rw", ["itemRelationships"], async () => {
 		const { relatedWords, relatedKanjis, relatedCounters } = await getRelatedItemsIdsItem(
 			item.id,
