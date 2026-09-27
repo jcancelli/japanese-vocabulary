@@ -8,7 +8,7 @@ It is meant to be used on portrait screens (no responsive css for panoramic scre
 
 ## TODO
 
-- upscale icons
+- wordType filter in items list extended search
 - more info in the correct study page (alternative answers, maybe more)
 - kanji drawing
 - grammar rules
