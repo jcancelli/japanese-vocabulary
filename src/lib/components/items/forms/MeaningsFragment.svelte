@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Helper from "flowbite-svelte/Helper.svelte"
-	import type { WordMeaningDTO } from "$lib/dto.svelte"
 	import MeaningsInput from "../MeaningsInput.svelte"
-	import Labeled from "../Labeled.svelte"
+	import type { MeaningDTO } from "$lib/dto.svelte"
+	import Labeled from "$lib/components/Labeled.svelte"
 
 	export interface WordMeaningsFragmentProps {
-		value: WordMeaningDTO[]
+		value: MeaningDTO[]
 		error?: string | null | undefined
 		disabled?: boolean
 		class?: string

@@ -1,26 +1,34 @@
 <script lang="ts">
-	import type { UUIDv4 } from "$lib/model"
+	import type { ItemType, UUIDv4 } from "$lib/model"
 	import Fuse from "fuse.js"
 	import Search from "flowbite-svelte/Search.svelte"
 	import Listgroup from "flowbite-svelte/Listgroup.svelte"
 	import CloseButton from "flowbite-svelte/CloseButton.svelte"
-	import { getAllKanjis, getKanjis } from "$lib/database/kanjis"
+	import { getAllItemsOfType, getItems } from "$lib/database/items"
 
-	export interface RelatedKanjisInputProps {
+	export interface RelatedItemsInputProps {
 		value: UUIDv4[]
+		itemId: UUIDv4
+		relatedType: ItemType
 		disabled?: boolean
 		class?: string
 	}
 
-	let { value = $bindable(), disabled, ...props }: RelatedKanjisInputProps = $props()
+	let {
+		value = $bindable(),
+		itemId,
+		relatedType,
+		disabled,
+		...props
+	}: RelatedItemsInputProps = $props()
 
 	let searchTerm = $state("")
 
 	const fusePromise = $derived(
-		getAllKanjis().then(
-			(kanjis) =>
-				new Fuse(kanjis, {
-					keys: ["kanji", "onyomi", "kunyomi", "nanori", "meanings.meaning"],
+		getAllItemsOfType(relatedType).then(
+			(items) =>
+				new Fuse(items, {
+					keys: ["searchStrings"],
 				}),
 		),
 	)
@@ -37,13 +45,13 @@
 		)
 	})
 
-	const relatedKanjisPromise = $derived(getKanjis(value))
+	const relatedItemsPromise = $derived(getItems(value))
 
-	function addRelatedKanji(entryId: UUIDv4) {
-		if (value.includes(entryId)) {
+	function addRelatedItem(relatedItemId: UUIDv4) {
+		if (value.includes(relatedItemId)) {
 			throw new Error()
 		}
-		value.push(entryId)
+		value.push(relatedItemId)
 		searchTerm = ""
 	}
 </script>
@@ -53,7 +61,7 @@
 	<div>
 		<Search
 			bind:value={searchTerm}
-			placeholder="Search kanjis"
+			placeholder="Search"
 			clearable
 			clearableOnClick={() => (searchTerm = "")}
 			{disabled}
@@ -63,17 +71,17 @@
 				<Listgroup
 					active
 					items={suggestions.map((suggestion) => {
-						const { id, kanji, meanings } = suggestion.item
-						return { name: `${kanji} (${meanings[0].meaning})`, kanjiid: id }
+						const { id, primaryWriting, primaryMeaning } = suggestion.item
+						return { name: `${primaryWriting} (${primaryMeaning.meaning})`, itemid: id }
 					})}
 					onclick={(e) => {
 						if (disabled) {
 							return
 						}
-						const suggestedKanjiId = (
+						const suggestedItemId = (
 							e!.currentTarget as HTMLButtonElement
-						).attributes.getNamedItem("kanjiid")?.nodeValue
-						addRelatedKanji(suggestedKanjiId as UUIDv4)
+						).attributes.getNamedItem("itemid")?.nodeValue
+						addRelatedItem(suggestedItemId as UUIDv4)
 					}}
 				/>
 			{/await}
@@ -81,15 +89,16 @@
 	</div>
 	<!-- Entries -->
 	<div class="grid grid-cols-[1fr_2.4rem] items-center p-4">
-		{#await relatedKanjisPromise then relatedKanjis}
-			{#each relatedKanjis as relatedKanji, i (relatedKanji.id)}
-				<p class="text-sm">{relatedKanji.kanji} ({relatedKanji.meanings[0].meaning})</p>
+		{#await relatedItemsPromise then relatedItems}
+			{#each relatedItems as relatedItem, i (relatedItem.id)}
+				{@const { primaryWriting, primaryMeaning } = relatedItem}
+				<p class="text-sm">{primaryWriting} ({primaryMeaning.meaning})</p>
 				<CloseButton
 					onclick={() => value.splice(i, 1)}
 					class="w-fit"
 				/>
 			{:else}
-				<p class="col-span-2 text-center">No entry</p>
+				<p class="col-span-2 text-center text-neutral-400">No entry</p>
 			{/each}
 		{/await}
 	</div>

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { VerbTransitivity } from "$lib/model"
+	import Labeled from "$lib/components/Labeled.svelte"
+	import type { VerbTransitivityDTO } from "$lib/dto.svelte"
 	import Helper from "flowbite-svelte/Helper.svelte"
-	import VerbTransitivityInput from "../VerbTransitivityInput.svelte"
-	import Labeled from "../Labeled.svelte"
+	import VerbTransitivityInput from "../../VerbTransitivityInput.svelte"
 
 	export interface VerbTransitivityFragmentProps {
-		value: VerbTransitivity
+		value?: VerbTransitivityDTO | undefined
 		error?: string | null | undefined
 		disabled?: boolean
 		class?: string

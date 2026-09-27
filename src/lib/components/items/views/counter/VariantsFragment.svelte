@@ -9,6 +9,12 @@
 
 	let { counter, ...props }: VariantsFragmentProps = $props()
 
+	const sortedKeyValuePairs = $derived(
+		Array.from(counter.variants.entries())
+			.sort((a, b) => a[0] - b[0])
+			.map(([numeric, writing]) => ({ numeric, writing })),
+	)
+
 	const NUMBER = {
 		1: "一",
 		2: "二",
@@ -29,12 +35,10 @@
 	class={props.class}
 >
 	<div class="grid grid-cols-3 text-center">
-		{#each counter.variants as { n, hiragana }}
-			{#if hiragana}
-				<p>{n}</p>
-				<p>{NUMBER[n as keyof typeof NUMBER]}{counter.counter}</p>
-				<p>{hiragana}</p>
-			{/if}
+		{#each sortedKeyValuePairs as { numeric, writing }}
+			<p>{numeric}</p>
+			<p>{NUMBER[numeric as keyof typeof NUMBER]}{counter.counter}</p>
+			<p>{writing}</p>
 		{/each}
 	</div>
 </Labeled>

@@ -1,24 +1,24 @@
 <script lang="ts">
-	import RelatedWordsInput from "$lib/components/kanji/RelatedWordsInput.svelte"
 	import Labeled from "$lib/components/Labeled.svelte"
-	import type { UUIDv4 } from "$lib/model"
 	import { Helper } from "flowbite-svelte"
+	import ReadingsInput from "../../inputs/kanji/ReadingsInput.svelte"
 
-	export interface RelatedWordsFragmentProps {
-		value: UUIDv4[]
+	export interface ReadingsFragmentProps {
+		label: string
+		value: string[]
 		error?: string | null | undefined
 		disabled?: boolean
 		class?: string
 	}
 
-	let { value = $bindable(), error, disabled, ...props }: RelatedWordsFragmentProps = $props()
+	let { label, value = $bindable(), error, disabled, ...props }: ReadingsFragmentProps = $props()
 </script>
 
 <Labeled
-	label="Related words"
+	{label}
 	{...props}
 >
-	<RelatedWordsInput
+	<ReadingsInput
 		bind:value
 		{disabled}
 	/>

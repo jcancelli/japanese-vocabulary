@@ -1,25 +1,28 @@
 <script lang="ts">
-	import ReadingsInput from "$lib/components/kanji/ReadingsInput.svelte"
 	import Labeled from "$lib/components/Labeled.svelte"
-	import { Helper } from "flowbite-svelte"
+	import Helper from "flowbite-svelte/Helper.svelte"
+	import Tags from "flowbite-svelte/Tags.svelte"
 
-	export interface OnyomiFragmentProps {
+	export interface TagsFragmentProps {
 		value: string[]
 		error?: string | null | undefined
 		disabled?: boolean
 		class?: string
 	}
 
-	let { value = $bindable(), error, disabled, ...props }: OnyomiFragmentProps = $props()
+	let { value = $bindable(), error, disabled, ...props }: TagsFragmentProps = $props()
 </script>
 
 <Labeled
-	label="On'yomi readings"
+	label="Tags"
 	{...props}
 >
-	<ReadingsInput
+	<Tags
 		bind:value
 		{disabled}
+		unique
+		showHelper
+		color={error ? "red" : "default"}
 	/>
 	{#if error}
 		<Helper

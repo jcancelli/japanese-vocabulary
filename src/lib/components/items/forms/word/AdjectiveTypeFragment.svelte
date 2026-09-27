@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Helper from "flowbite-svelte/Helper.svelte"
-	import AdjectiveTypeInput from "../AdjectiveTypeInput.svelte"
 	import type { AdjectiveType } from "$lib/model"
-	import Labeled from "../Labeled.svelte"
+	import Labeled from "$lib/components/Labeled.svelte"
+	import AdjectiveTypeInput from "../../AdjectiveTypeInput.svelte"
 
 	export interface AdjectiveTypeFragmentProps {
-		value: AdjectiveType
+		value?: AdjectiveType | undefined
 		error?: string | null | undefined
 		disabled?: boolean
 		class?: string

@@ -2,7 +2,7 @@
 	import Helper from "flowbite-svelte/Helper.svelte"
 	import DifficultyInput from "../DifficultyInput.svelte"
 	import type { Difficulty } from "$lib/model"
-	import Labeled from "../Labeled.svelte"
+	import Labeled from "$lib/components/Labeled.svelte"
 
 	export interface DifficultyFragment {
 		value: Difficulty

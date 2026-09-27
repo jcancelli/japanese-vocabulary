@@ -1,11 +1,11 @@
 <script lang="ts">
+	import Labeled from "$lib/components/Labeled.svelte"
 	import type { VerbType } from "$lib/model"
 	import Helper from "flowbite-svelte/Helper.svelte"
-	import VerbTypeInput from "../VerbTypeInput.svelte"
-	import Labeled from "../Labeled.svelte"
+	import VerbTypeInput from "../../VerbTypeInput.svelte"
 
 	export interface VerbTypeFragmentProps {
-		value: VerbType
+		value?: VerbType | undefined
 		error?: string | null | undefined
 		disabled?: boolean
 		class?: string

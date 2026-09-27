@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Helper from "flowbite-svelte/Helper.svelte"
 	import type { ExampleSentence } from "$lib/model"
-	import Labeled from "../Labeled.svelte"
 	import ExampleSentencesInput from "../ExampleSentencesInput.svelte"
+	import Labeled from "$lib/components/Labeled.svelte"
 
 	export interface ExampleSentencesFragmentProps {
 		value: ExampleSentence[]

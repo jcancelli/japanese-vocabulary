@@ -2,10 +2,10 @@
 	import Helper from "flowbite-svelte/Helper.svelte"
 	import JLPTLevelInput from "../JLPTLevelInput.svelte"
 	import type { JLPTLevel } from "$lib/model"
-	import Labeled from "../Labeled.svelte"
+	import Labeled from "$lib/components/Labeled.svelte"
 
 	export interface JLPTLevelFragmentProps {
-		value: JLPTLevel
+		value?: JLPTLevel | undefined
 		error?: string | null | undefined
 		disabled?: boolean
 		class?: string

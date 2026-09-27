@@ -3,7 +3,7 @@
 	import Input from "flowbite-svelte/Input.svelte"
 	import Helper from "flowbite-svelte/Helper.svelte"
 	import PlusIcon from "flowbite-svelte-icons/PlusOutline.svelte"
-	import Labeled from "../Labeled.svelte"
+	import Labeled from "$lib/components/Labeled.svelte"
 
 	export interface KanjiFragmentProps {
 		value: string | undefined
